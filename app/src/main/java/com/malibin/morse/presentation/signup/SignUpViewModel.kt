@@ -2,6 +2,8 @@ package com.malibin.morse.presentation.signup
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.malibin.morse.R
+import com.malibin.morse.presentation.utils.SingleLiveEvent
 
 /**
  * Created By Malibin
@@ -11,8 +13,21 @@ import androidx.lifecycle.ViewModel
 class SignUpViewModel : ViewModel() {
 
     val pagerPosition = MutableLiveData(0)
+    val email = MutableLiveData("")
+    val verifyNumber = MutableLiveData("")
+    val nickname = MutableLiveData("")
+    val password = MutableLiveData("")
+    val passwordCheck = MutableLiveData("")
 
-    fun goNextPage() {
+    val toastMessage = SingleLiveEvent<Int>()
+
+    fun goSignUpNextStep() = when {
+        email.value.isNullOrBlank() -> toastMessage.value = R.string.input_email
+        verifyNumber.value.isNullOrBlank() -> toastMessage.value = R.string.input_verify_number
+        else -> goNextPage()
+    }
+
+    private fun goNextPage() {
         if (getCurrentPagerPosition() == MAX_PAGE_INDEX) return
         pagerPosition.value = getCurrentPagerPosition() + 1
     }
@@ -24,6 +39,21 @@ class SignUpViewModel : ViewModel() {
 
     fun getCurrentPagerPosition(): Int = pagerPosition.value
         ?: error("pagerPosition cannot be null")
+
+    fun submitSignUp() = when {
+        email.value.isNullOrBlank() -> toastMessage.value = R.string.input_email
+        verifyNumber.value.isNullOrBlank() -> toastMessage.value = R.string.input_verify_number
+        nickname.value.isNullOrBlank() -> toastMessage.value = R.string.input_nickname
+        password.value.isNullOrBlank() -> toastMessage.value = R.string.input_password
+        isPasswordsNotEqual() -> toastMessage.value = R.string.passwords_not_equal
+        else -> {
+            // TODO 실제 회원가입 로직
+        }
+    }
+
+    private fun isPasswordsNotEqual(): Boolean {
+        return password.value != passwordCheck.value
+    }
 
     companion object {
         const val PAGE_COUNT = 2

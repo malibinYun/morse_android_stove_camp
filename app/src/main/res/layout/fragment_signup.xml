@@ -32,6 +32,7 @@
             android:layout_marginEnd="32dp"
             android:ems="10"
             android:inputType="textPersonName"
+            android:text="@={viewModel.nickname}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView5" />
@@ -59,6 +60,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName|textPassword"
+            android:text="@={viewModel.password}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView7" />
@@ -80,6 +82,7 @@
             android:layout_marginEnd="32dp"
             android:ems="10"
             android:inputType="textPersonName|textPassword"
+            android:text="@={viewModel.passwordCheck}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView9" />
@@ -90,6 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
             android:gravity="center"
+            android:onClick="@{() -> viewModel.submitSignUp()}"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:text="회원가입"

@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.malibin.morse.databinding.ActivitySignUpBinding
+import com.malibin.morse.presentation.utils.showToast
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -31,6 +32,7 @@ class SignUpActivity : AppCompatActivity() {
         signUpViewModel.pagerPosition.observe(this) {
             binding.pagerSignup.currentItem = it ?: return@observe
         }
+        signUpViewModel.toastMessage.observe(this) { showToast(it ?: return@observe) }
     }
 
     override fun onBackPressed() {

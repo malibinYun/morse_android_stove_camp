@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Morse</string>
+
+    <string name="input_email">이메일을 입력하세요.</string>
+    <string name="input_verify_number">인증번호를 입력하세요.</string>
+    <string name="verify_number_invalid">인증번호가 유효하지 않습니다.</string>
+    <string name="input_nickname">닉네임을 입력하세요.</string>
+    <string name="nickname_exist">해당 닉네임이 이미 존재합니다.</string>
+    <string name="input_password">비밀번호를 입력하세요.</string>
+    <string name="passwords_not_equal">비밀번호가 서로 다릅니다.</string>
 </resources>
