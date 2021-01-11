@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.malibin.morse">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:name=".presentation.MorseApplication"
         android:allowBackup="true"
@@ -10,14 +14,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Morse">
-        <activity android:name=".presentation.signup.SignUpActivity" />
-        <activity android:name=".presentation.LoginActivity">
+
+        <activity android:name=".presentation.broadcast.BroadCastActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".presentation.signup.SignUpActivity" />
+        <activity android:name=".presentation.LoginActivity"></activity>
     </application>
 
 </manifest>

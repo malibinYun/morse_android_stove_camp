@@ -8,4 +8,5 @@
     <string name="nickname_exist">해당 닉네임이 이미 존재합니다.</string>
     <string name="input_password">비밀번호를 입력하세요.</string>
     <string name="passwords_not_equal">비밀번호가 서로 다릅니다.</string>
+    <string name="permission_rejected">권한을 거부하시면 서비스를 이용하실 수 없어요 ㅠㅠ</string>
 </resources>
