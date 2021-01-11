@@ -9,7 +9,9 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.malibin.morse.databinding.ActivitySignUpBinding
 import com.malibin.morse.presentation.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
 
     private var binding: ActivitySignUpBinding? = null

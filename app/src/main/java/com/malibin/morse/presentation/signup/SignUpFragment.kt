@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.malibin.morse.databinding.FragmentSignupBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Created By Malibin
  * on 1월 08, 2021
  */
 
+@AndroidEntryPoint
 class SignUpFragment : Fragment() {
 
     private val signUpViewModel: SignUpViewModel by activityViewModels()

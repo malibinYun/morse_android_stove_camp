@@ -1,5 +1,6 @@
 package com.malibin.morse.presentation.signup
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.malibin.morse.R
@@ -10,7 +11,7 @@ import com.malibin.morse.presentation.utils.SingleLiveEvent
  * on 1월 11, 2021
  */
 
-class SignUpViewModel : ViewModel() {
+class SignUpViewModel @ViewModelInject constructor() : ViewModel() {
 
     val pagerPosition = MutableLiveData(0)
     val email = MutableLiveData("")
