@@ -1,12 +1,15 @@
 package com.malibin.morse.presentation.broadcast
 
 import android.content.pm.PackageManager
+import android.hardware.Camera
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import com.malibin.morse.R
 import com.malibin.morse.databinding.ActivityBroadCastBinding
 import com.malibin.morse.presentation.utils.showToast
+import org.webrtc.EglBase
+import org.webrtc.RendererCommon
 
 class BroadCastActivity : AppCompatActivity() {
 
@@ -15,12 +18,29 @@ class BroadCastActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding = ActivityBroadCastBinding.inflate(layoutInflater)
-        this.binding = binding
+        if (hasNoCamera()) {
+            showToast(R.string.cannot_broadcast_no_camera)
+            finish()
+            return
+        }
+        val binding = ActivityBroadCastBinding.inflate(layoutInflater).also { this.binding = it }
         setContentView(binding.root)
+        initView(binding)
 
         if (isPermissionsGranted()) showToast("이미 권한 부여함")
         else askPermissions()
+    }
+
+    private fun hasNoCamera(): Boolean =
+        packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
+
+    private fun initView(binding: ActivityBroadCastBinding) {
+        binding.windowBroadcastSurface.apply {
+            init(EglBase.create().eglBaseContext, null) // eglBaseContext가 Viewmodel에서도 필요함.
+            setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+            setEnableHardwareScaler(true)
+            setMirror(true)
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -32,7 +52,7 @@ class BroadCastActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             val isAllPermissionGranted =
                 grantResults.isNotEmpty() && grantResults.all { it == PERMISSION_GRANTED }
-            if(isAllPermissionGranted) showToast("권한부여됨")
+            if (isAllPermissionGranted) showToast("권한부여됨")
             else showPermissionRejected()
         }
     }
@@ -53,12 +73,13 @@ class BroadCastActivity : AppCompatActivity() {
         return isCameraGranted == PERMISSION_GRANTED && isMicGranted == PERMISSION_GRANTED
     }
 
+    private fun requireBinding() = binding ?: error("activity not inflated yet")
+
     override fun onDestroy() {
         super.onDestroy()
+        binding?.windowBroadcastSurface?.release()
         binding = null
     }
-
-    private fun requireBinding() = binding ?: error("activity not inflated yet")
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 1000
