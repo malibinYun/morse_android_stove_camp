@@ -28,7 +28,7 @@ class BroadCastViewModel @ViewModelInject constructor(
 
     fun connectPeer(eglBase: EglBase, videoCapturer: VideoCapturer, localRenderer: VideoSink) {
         peerConnectionClient = PeerConnectionClient(context, eglBase)
-        peerConnectionClient.connectPeer(videoCapturer, localRenderer)
+        peerConnectionClient.connectPeer(videoCapturer, localRenderer, this)
     }
 
     override fun onSignalingChange(newState: PeerConnection.SignalingState?) {

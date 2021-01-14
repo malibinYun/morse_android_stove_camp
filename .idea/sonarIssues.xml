@@ -18,6 +18,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../WebRTC/imported-webrtc-example/app/src/main/java/org/appspot/apprtc/WebSocketRTCClient.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../kurento/nc-android-webrtcpeer/webrtcpeer/src/main/java/com/nhancv/webrtcpeer/rtc_peer/PeerConnectionClient.java">
           <value>
             <set />
@@ -159,6 +164,16 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/PeerConnectionFactoryExt.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/RtcClient.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/WebSocketRtcClient.kt">
           <value>
             <set />
           </value>

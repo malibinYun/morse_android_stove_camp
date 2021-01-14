@@ -30,7 +30,11 @@ class PeerConnectionClient(
         createPeerConnectionFactory(context, eglBase)
     private lateinit var peerConnection: PeerConnection
 
-    fun connectPeer(videoCapturer: VideoCapturer, localRenderer: VideoSink) {
+    fun connectPeer(
+        videoCapturer: VideoCapturer,
+        localRenderer: VideoSink,
+        observer: PeerConnection.Observer
+    ) {
         val rtcConfiguration = PeerConnection.RTCConfiguration(ICE_SERVERS).apply {
             tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED
             bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
@@ -39,8 +43,7 @@ class PeerConnectionClient(
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
         }
 
-        peerConnection = peerConnectionFactory
-            .createPeerConnection(rtcConfiguration, PeerConnectionObserver())
+        peerConnection = peerConnectionFactory.createPeerConnection(rtcConfiguration, observer)
             ?: error("Cannot Create Peer Connection")
 
         // Set INFO libjingle logging.
@@ -103,51 +106,5 @@ class PeerConnectionClient(
             .setPassword("root")
             .createIceServer()
         private val ICE_SERVERS = listOf(MORSE_TURN_SERVER)
-    }
-
-    private inner class PeerConnectionObserver : PeerConnection.Observer {
-        override fun onSignalingChange(p0: PeerConnection.SignalingState?) {
-            printLog("onSignalingChange : $p0")
-        }
-
-        override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-            printLog("onIceConnectionChange : $p0")
-        }
-
-        override fun onIceConnectionReceivingChange(p0: Boolean) {
-            printLog("onIceConnectionReceivingChange : $p0")
-        }
-
-        override fun onIceGatheringChange(p0: PeerConnection.IceGatheringState?) {
-            printLog("onIceGatheringChange : $p0")
-        }
-
-        override fun onIceCandidate(p0: IceCandidate?) {
-            printLog("onIceCandidate : $p0")
-        }
-
-        override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {
-            printLog("onIceCandidatesRemoved : $p0")
-        }
-
-        override fun onAddStream(p0: MediaStream?) {
-            printLog("onAddStream : $p0")
-        }
-
-        override fun onRemoveStream(p0: MediaStream?) {
-            printLog("onRemoveStream : $p0")
-        }
-
-        override fun onDataChannel(p0: DataChannel?) {
-            printLog("onDataChannel : $p0")
-        }
-
-        override fun onRenegotiationNeeded() {
-            printLog("onRenegotiationNeeded ")
-        }
-
-        override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
-            printLog("onAddTrack : $p0 , $p1")
-        }
     }
 }
