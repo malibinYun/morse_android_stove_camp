@@ -1,8 +1,8 @@
 package com.malibin.morse.presentation
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.malibin.morse.databinding.ActivityLoginBinding
 import com.malibin.morse.presentation.signup.SignUpActivity
 import dagger.hilt.android.AndroidEntryPoint

@@ -1,19 +1,25 @@
 package com.malibin.morse.presentation.broadcast
 
 import android.content.pm.PackageManager
-import android.hardware.Camera
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.malibin.morse.R
 import com.malibin.morse.databinding.ActivityBroadCastBinding
 import com.malibin.morse.presentation.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
+import org.webrtc.Camera2Enumerator
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
+import org.webrtc.VideoCapturer
+import org.webrtc.VideoSink
 
+@AndroidEntryPoint
 class BroadCastActivity : AppCompatActivity() {
 
     private var binding: ActivityBroadCastBinding? = null
+    private val broadCastViewModel: BroadCastViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +77,18 @@ class BroadCastActivity : AppCompatActivity() {
         val isCameraGranted = ActivityCompat.checkSelfPermission(this, CAMERA_PERMISSION)
         val isMicGranted = ActivityCompat.checkSelfPermission(this, MIC_PERMISSION)
         return isCameraGranted == PERMISSION_GRANTED && isMicGranted == PERMISSION_GRANTED
+    }
+
+    private fun createVideoCapturer(): VideoCapturer {
+        val cameraEnumerator = Camera2Enumerator(this)
+        val deviceName = cameraEnumerator.deviceNames.find { cameraEnumerator.isFrontFacing(it) }
+            ?: cameraEnumerator.deviceNames.find { cameraEnumerator.isBackFacing(it) }
+            ?: error("Cannot Find Camera")
+        return cameraEnumerator.createCapturer(deviceName, null)
+    }
+
+    private fun getLocalRenderder(): VideoSink = VideoSink {
+        requireBinding().windowBroadcastSurface.onFrame(it)
     }
 
     private fun requireBinding() = binding ?: error("activity not inflated yet")

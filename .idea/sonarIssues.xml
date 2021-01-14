@@ -8,7 +8,32 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../WebRTC/imported-webrtc-example/app/src/main/java/org/appspot/apprtc/CallActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../WebRTC/imported-webrtc-example/app/src/main/java/org/appspot/apprtc/PeerConnectionClient.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../kurento/nc-android-webrtcpeer/webrtcpeer/src/main/java/com/nhancv/webrtcpeer/rtc_peer/PeerConnectionClient.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/MMySocket.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/MalibinUtil.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/Util.java">
           <value>
             <set />
           </value>
@@ -19,6 +44,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/broadcaster/BroadCasterPresenter.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/rtc_peer/kurento/KurentoPresenterRTCClient.java">
           <value>
             <set />
           </value>
@@ -78,6 +108,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/presentation/broadcast/BroadCastViewModel.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/presentation/signup/EmailVerifyFragment.kt">
           <value>
             <set />
@@ -109,6 +144,21 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/presentation/utils/ViewUtils.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/MorsePeerConnectionFactory.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/PeerConnectionClient.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/PeerConnectionFactoryExt.kt">
           <value>
             <set />
           </value>

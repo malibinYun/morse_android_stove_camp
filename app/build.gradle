@@ -59,9 +59,10 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
 
     // WebRTC
-    implementation files('libs/audio_device_java.jar')
-    implementation files('libs/base_java.jar')
-    implementation files('libs/libjingle_peerconnection.jar')
+//    implementation files('libs/audio_device_java.jar')
+//    implementation files('libs/base_java.jar')
+//    implementation files('libs/libjingle_peerconnection.jar')
+    implementation 'org.webrtc:google-webrtc:1.0.+'
 
     // LifeCycle
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"

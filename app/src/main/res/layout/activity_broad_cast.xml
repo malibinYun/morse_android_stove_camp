@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".presentation.broadcast.BroadCastActivity">
 
-
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/window_broadcast_surface"
         android:layout_width="match_parent"
