@@ -1,7 +1,7 @@
 package com.malibin.morse.rtc
 
+import com.malibin.morse.presentation.utils.printLog
 import java.io.InputStream
-import java.net.Socket
 import java.net.URI
 import java.security.KeyStore
 import java.security.cert.CertificateFactory
@@ -9,6 +9,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
+import org.json.JSONObject
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 
@@ -18,18 +19,13 @@ import org.webrtc.SessionDescription
  */
 
 class WebSocketRtcClient(
-    certificateInputStream: InputStream? = null, uri: URI
-) : WebSocketClient(uri), RtcClient {
+    private val callback: WebSocketCallback
+) : WebSocketClient(HOST_URI), RtcClient {
 
-    init {
-        socket = createSslSafeSocket(certificateInputStream)
-    }
+    fun setTrustedCertificate(certificateInputStream: InputStream?) {
+        if (isOpen) error("cannot set certificate when socket opened")
+        if (certificateInputStream == null) socket = null
 
-    constructor(certificateInputStream: InputStream?, hostUrl: String)
-            : this(certificateInputStream, URI(hostUrl))
-
-    private fun createSslSafeSocket(certificateInputStream: InputStream?): Socket? {
-        if (certificateInputStream == null) return null
         val certificateFactory = CertificateFactory.getInstance("X.509")
         val certificate = certificateFactory.generateCertificate(certificateInputStream)
 
@@ -44,19 +40,23 @@ class WebSocketRtcClient(
 
         val sslContext = SSLContext.getInstance("TLS")
         sslContext.init(null, trustManagerFactory.trustManagers, null)
-        return sslContext.socketFactory.createSocket()
+        socket = sslContext.socketFactory.createSocket()
     }
 
     override fun onOpen(handshakedata: ServerHandshake?) {
+        callback.onOpen(handshakedata)
     }
 
     override fun onMessage(message: String?) {
+        callback.onMessage(message)
     }
 
     override fun onClose(code: Int, reason: String?, remote: Boolean) {
+        callback.onClose(code, reason, remote)
     }
 
     override fun onError(ex: Exception?) {
+        callback.onError(ex)
     }
 
     override fun connectRoom() {
@@ -64,15 +64,46 @@ class WebSocketRtcClient(
     }
 
     override fun sendOfferSessionDescription(sessionDescription: SessionDescription) {
-
+        val json = JSONObject().apply {
+            put("id", "presenter")
+            put("sdpOffer", sessionDescription.description)
+        }
+        send(json.toString())
     }
+    // presenter 이런건 Room Parameter같은걸로 받아서 enum으로 처리하자
 
     override fun sendAnswerSessionDescription(sessionDescription: SessionDescription) {
+        printLog("sendAnswerSessionDescription : $sessionDescription")
     }
 
     override fun sendLocalIceCandidate(iceCandidate: IceCandidate) {
+        val json = JSONObject().apply {
+            put("id", "onIceCandidate")
+            put("candidate", iceCandidate.toJson())
+        }
+        send(json.toString())
     }
 
     override fun sendLocalIceCandidateRemovals(iceCandidates: Array<IceCandidate?>) {
+        printLog("sendLocalIceCandidateRemovals : ${iceCandidates.toList()}")
+    }
+
+    companion object {
+        private val HOST_URI = URI("wss://goto.downsups.kro.kr/call")
     }
 }
+
+//class WebSocketService(uri: URI) : WebSocketClient(uri) {
+//    override fun onOpen(handshakedata: ServerHandshake?) {
+//
+//    }
+//
+//    override fun onMessage(message: String?) {
+//    }
+//
+//    override fun onClose(code: Int, reason: String?, remote: Boolean) {
+//    }
+//
+//    override fun onError(ex: Exception) {
+//    }
+//}

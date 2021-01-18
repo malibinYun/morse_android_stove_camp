@@ -3,16 +3,14 @@ package com.malibin.morse.rtc
 import android.content.Context
 import com.malibin.morse.presentation.utils.printLog
 import org.webrtc.AudioTrack
-import org.webrtc.DataChannel
 import org.webrtc.EglBase
-import org.webrtc.IceCandidate
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
-import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
-import org.webrtc.RtpReceiver
 import org.webrtc.RtpSender
+import org.webrtc.SdpObserver
+import org.webrtc.SessionDescription
 import org.webrtc.VideoCapturer
 import org.webrtc.VideoSink
 import org.webrtc.VideoTrack
@@ -23,11 +21,8 @@ import org.webrtc.VideoTrack
  */
 
 class PeerConnectionClient(
-    context: Context,
-    private val eglBase: EglBase,
+    private val peerConnectionFactory: PeerConnectionFactory
 ) {
-    private val peerConnectionFactory: PeerConnectionFactory =
-        createPeerConnectionFactory(context, eglBase)
     private lateinit var peerConnection: PeerConnection
 
     fun connectPeer(
@@ -92,10 +87,88 @@ class PeerConnectionClient(
         return peerConnection.senders.find { it.track()?.kind() == "video" }
     }
 
+    fun createOffer() {
+        val sdpObserver = SessionDescriptionProtocolObserver()
+        val sdpMediaConstraints = createSdpConstraints()
+        peerConnection.createOffer(sdpObserver, sdpMediaConstraints)
+    }
+
     private fun createSdpConstraints(): MediaConstraints {
         return MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
+        }
+    }
+
+    private inner class SessionDescriptionProtocolObserver : SdpObserver {
+
+        private var localDescription: SessionDescription? = null
+
+        override fun onCreateSuccess(sessionDescription: SessionDescription) {
+            if (localDescription != null) {
+                printLog("onCreateSuccess / Multiple SDP create.")
+                return
+            }
+            val description = preferCodec(sessionDescription.description, "VP8", false)
+            val localDescription = SessionDescription(sessionDescription.type, description)
+            this.localDescription = localDescription
+            printLog("onCreateSuccess / set local description")
+            // 비동기 동작
+            peerConnection.setLocalDescription(this, localDescription)
+        }
+
+        private fun preferCodec(
+            sessionDescription: String,
+            codec: String,
+            isAudio: Boolean
+        ): String {
+            val descriptions = sessionDescription.split("\r\n").toMutableList()
+            val mediaType = if (isAudio) "m=audio " else "m=video "
+            val mediaDescription = descriptions.find { it.startsWith(mediaType) }
+                ?: return sessionDescription.also { printLog("No mediaDescription line, so can't prefer $codec") }
+
+            val codecRegex = Regex("^a=rtpmap:(\\d+) $codec(/\\d+)+[\r]?$")
+            val codecPayloadTypes = descriptions
+                .mapNotNull { codecRegex.find(it) }
+                .map { it.value }
+
+            val updatedMediaDescription =
+                movePayloadTypesToFront(codecPayloadTypes, mediaDescription)
+
+            val mediaDescriptionIndex = descriptions.indexOf(mediaDescription)
+            descriptions[mediaDescriptionIndex] = updatedMediaDescription
+            return descriptions.joinToString("\r\n", postfix = "\r\n")
+        }
+
+        private fun movePayloadTypesToFront(
+            preferredPayloadTypes: List<String>,
+            mediaDescription: String,
+        ): String {
+            val mediaDescriptionParts = mediaDescription.split(" ")
+            val header = mediaDescriptionParts.subList(0, 3)
+            val unPreferredPayLoadTypes =
+                mediaDescriptionParts.subList(3, mediaDescriptionParts.size).toMutableList()
+            unPreferredPayLoadTypes.removeAll(preferredPayloadTypes)
+
+            return mutableListOf<String>().apply {
+                addAll(header)
+                addAll(preferredPayloadTypes)
+                addAll(unPreferredPayLoadTypes)
+            }.joinToString(" ")
+        }
+
+        override fun onSetSuccess() {
+            if (peerConnection.remoteDescription == null) {
+
+            }
+        }
+
+        override fun onCreateFailure(message: String?) {
+            printLog("SDP onCreateFailure : $message")
+        }
+
+        override fun onSetFailure(message: String?) {
+            printLog("SDP onSetFailure : $message")
         }
     }
 
