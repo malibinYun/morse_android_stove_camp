@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import com.malibin.morse.presentation.utils.printLog
+import com.malibin.morse.rtc.CreateOfferCallback
 import com.malibin.morse.rtc.PeerConnectionClient
 import com.malibin.morse.rtc.WebSocketCallback
 import com.malibin.morse.rtc.WebSocketRtcClient
@@ -16,6 +17,7 @@ import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.RtpReceiver
+import org.webrtc.SessionDescription
 import org.webrtc.VideoCapturer
 import org.webrtc.VideoSink
 
@@ -38,7 +40,8 @@ class BroadCastViewModel @ViewModelInject constructor(
     private inner class WebSocketCallbackImpl : WebSocketCallback {
         override fun onOpen(handshake: ServerHandshake?) {
             printLog("Socket Opened")
-            peerConnectionClient.createOffer()
+            peerConnectionClient.createOffer(CreateOfferCallbackImpl())
+
         }
 
         override fun onMessage(message: String?) {
@@ -51,6 +54,12 @@ class BroadCastViewModel @ViewModelInject constructor(
 
         override fun onError(exception: Exception?) {
 
+        }
+    }
+
+    private inner class CreateOfferCallbackImpl : CreateOfferCallback {
+        override fun onOfferSetSuccess(sessionDescription: SessionDescription) {
+            rtcClient.sendOfferSessionDescription(sessionDescription)
         }
     }
 
@@ -83,6 +92,7 @@ class BroadCastViewModel @ViewModelInject constructor(
         override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate?>) {
             // 비동기동작
             rtcClient.sendLocalIceCandidateRemovals(iceCandidates)
+            // 이것도 결국 로그만 찍음
         }
 
         override fun onAddStream(mediaStream: MediaStream?) {}

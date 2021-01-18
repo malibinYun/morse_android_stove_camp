@@ -1,9 +1,7 @@
 package com.malibin.morse.rtc
 
-import android.content.Context
 import com.malibin.morse.presentation.utils.printLog
 import org.webrtc.AudioTrack
-import org.webrtc.EglBase
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnection
@@ -24,6 +22,7 @@ class PeerConnectionClient(
     private val peerConnectionFactory: PeerConnectionFactory
 ) {
     private lateinit var peerConnection: PeerConnection
+    private var createOfferCallback: CreateOfferCallback? = null
 
     fun connectPeer(
         videoCapturer: VideoCapturer,
@@ -49,6 +48,8 @@ class PeerConnectionClient(
         mediaStream.addTrack(createAudioTrack())
         mediaStream.addTrack(createVideoTrack(videoCapturer, localRenderer))
         peerConnection.addStream(mediaStream)
+
+        setVideoMaxBitrate(1700)
     }
 
     private fun createAudioTrack(): AudioTrack {
@@ -83,11 +84,21 @@ class PeerConnectionClient(
         return MediaConstraints()
     }
 
-    private fun findVideoSender(peerConnection: PeerConnection): RtpSender? {
+    private fun setVideoMaxBitrate(maxBitrateKbps: Int?) {
+        val localVideoSender = findVideoSender() ?: return
+        val parameters = localVideoSender.parameters
+        parameters.encodings.forEach { encoding ->
+            encoding.maxBitrateBps = maxBitrateKbps?.let { it * 1_000 }
+        }
+        localVideoSender.parameters = parameters
+    }
+
+    private fun findVideoSender(): RtpSender? {
         return peerConnection.senders.find { it.track()?.kind() == "video" }
     }
 
-    fun createOffer() {
+    fun createOffer(callback: CreateOfferCallback) {
+        this.createOfferCallback = callback
         val sdpObserver = SessionDescriptionProtocolObserver()
         val sdpMediaConstraints = createSdpConstraints()
         peerConnection.createOffer(sdpObserver, sdpMediaConstraints)
@@ -98,6 +109,15 @@ class PeerConnectionClient(
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
         }
+    }
+
+    companion object {
+        private val MORSE_TURN_SERVER = PeerConnection.IceServer
+            .builder("turn:117.17.196.61:3478")
+            .setUsername("testuser")
+            .setPassword("root")
+            .createIceServer()
+        private val ICE_SERVERS = listOf(MORSE_TURN_SERVER)
     }
 
     private inner class SessionDescriptionProtocolObserver : SdpObserver {
@@ -159,8 +179,11 @@ class PeerConnectionClient(
 
         override fun onSetSuccess() {
             if (peerConnection.remoteDescription == null) {
-
+                val localDescription = localDescription ?: error("localDescription cannot be null")
+                createOfferCallback?.onOfferSetSuccess(localDescription)
+                return
             }
+            //drainCandidates()
         }
 
         override fun onCreateFailure(message: String?) {
@@ -170,14 +193,5 @@ class PeerConnectionClient(
         override fun onSetFailure(message: String?) {
             printLog("SDP onSetFailure : $message")
         }
-    }
-
-    companion object {
-        private val MORSE_TURN_SERVER = PeerConnection.IceServer
-            .builder("turn:117.17.196.61:3478")
-            .setUsername("testuser")
-            .setPassword("root")
-            .createIceServer()
-        private val ICE_SERVERS = listOf(MORSE_TURN_SERVER)
     }
 }
