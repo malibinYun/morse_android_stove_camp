@@ -5,6 +5,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.rtc.CreateOfferCallback
+import com.malibin.morse.rtc.MediaManager
 import com.malibin.morse.rtc.PeerConnectionClient
 import com.malibin.morse.rtc.WebSocketCallback
 import com.malibin.morse.rtc.WebSocketRtcClient
@@ -18,7 +19,6 @@ import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.RtpReceiver
 import org.webrtc.SessionDescription
-import org.webrtc.VideoCapturer
 import org.webrtc.VideoSink
 
 /**
@@ -32,13 +32,18 @@ class BroadCastViewModel @ViewModelInject constructor(
     private lateinit var peerConnectionClient: PeerConnectionClient
     private val rtcClient = WebSocketRtcClient(WebSocketCallbackImpl())
 
-    fun connectPeer(eglBase: EglBase, videoCapturer: VideoCapturer, localRenderer: VideoSink) {
-        peerConnectionClient = PeerConnectionClient(createPeerConnectionFactory(context, eglBase))
-        peerConnectionClient.connectPeer(videoCapturer, localRenderer, PeerConnectionObserver())
+    fun connectPeer(eglBase: EglBase, localVideoRenderer: VideoSink) {
+        val peerConnectionFactory = createPeerConnectionFactory(context, eglBase)
+        peerConnectionClient = PeerConnectionClient(
+            peerConnectionFactory,
+            MediaManager(context, peerConnectionFactory)
+        )
+        peerConnectionClient.connectPeer(PeerConnectionObserver())
+        peerConnectionClient.attachLocalVideoRenderer(localVideoRenderer)
     }
 
     fun disconnect() {
-
+        peerConnectionClient.close()
     }
 
     private inner class WebSocketCallbackImpl : WebSocketCallback {

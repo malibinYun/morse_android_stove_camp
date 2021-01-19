@@ -9,15 +9,14 @@ import com.malibin.morse.R
 import com.malibin.morse.databinding.ActivityBroadCastBinding
 import com.malibin.morse.presentation.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import org.webrtc.Camera2Enumerator
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
-import org.webrtc.VideoCapturer
 import org.webrtc.VideoSink
 
 @AndroidEntryPoint
 class BroadCastActivity : AppCompatActivity() {
 
+    private val rootEgl = EglBase.create()
     private var binding: ActivityBroadCastBinding? = null
     private val broadCastViewModel: BroadCastViewModel by viewModels()
 
@@ -42,7 +41,7 @@ class BroadCastActivity : AppCompatActivity() {
 
     private fun initView(binding: ActivityBroadCastBinding) {
         binding.windowBroadcastSurface.apply {
-            init(EglBase.create().eglBaseContext, null) // eglBaseContext가 Viewmodel에서도 필요함.
+            init(rootEgl.eglBaseContext, null) // eglBaseContext가 Viewmodel에서도 필요함.
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
             setEnableHardwareScaler(true)
             setMirror(true)
@@ -64,7 +63,7 @@ class BroadCastActivity : AppCompatActivity() {
     }
 
     private fun startBroadCast() {
-        broadCastViewModel.connectPeer(EglBase.create(), createVideoCapturer(), getLocalRenderder())
+        broadCastViewModel.connectPeer(rootEgl, getLocalRenderer())
     }
 
     private fun showPermissionRejected() {
@@ -83,15 +82,7 @@ class BroadCastActivity : AppCompatActivity() {
         return isCameraGranted == PERMISSION_GRANTED && isMicGranted == PERMISSION_GRANTED
     }
 
-    private fun createVideoCapturer(): VideoCapturer {
-        val cameraEnumerator = Camera2Enumerator(this)
-        val deviceName = cameraEnumerator.deviceNames.find { cameraEnumerator.isFrontFacing(it) }
-            ?: cameraEnumerator.deviceNames.find { cameraEnumerator.isBackFacing(it) }
-            ?: error("Cannot Find Camera")
-        return cameraEnumerator.createCapturer(deviceName, null)
-    }
-
-    private fun getLocalRenderder(): VideoSink = VideoSink {
+    private fun getLocalRenderer(): VideoSink = VideoSink {
         requireBinding().windowBroadcastSurface.onFrame(it)
     }
 
@@ -99,8 +90,10 @@ class BroadCastActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        broadCastViewModel.disconnect()
         binding?.windowBroadcastSurface?.release()
         binding = null
+        rootEgl.release()
     }
 
     companion object {

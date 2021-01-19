@@ -4,7 +4,6 @@ import com.malibin.morse.presentation.utils.printLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.webrtc.AudioTrack
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnection
@@ -12,9 +11,7 @@ import org.webrtc.PeerConnectionFactory
 import org.webrtc.RtpSender
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
-import org.webrtc.VideoCapturer
 import org.webrtc.VideoSink
-import org.webrtc.VideoTrack
 
 /**
  * Created By Malibin
@@ -22,16 +19,13 @@ import org.webrtc.VideoTrack
  */
 
 class PeerConnectionClient(
-    private val peerConnectionFactory: PeerConnectionFactory
+    private val peerConnectionFactory: PeerConnectionFactory,
+    private val mediaManager: MediaManager,
 ) {
     private lateinit var peerConnection: PeerConnection
     private var createOfferCallback: CreateOfferCallback? = null
 
-    fun connectPeer(
-        videoCapturer: VideoCapturer,
-        localRenderer: VideoSink,
-        observer: PeerConnection.Observer
-    ) {
+    fun connectPeer(observer: PeerConnection.Observer) {
         val rtcConfiguration = PeerConnection.RTCConfiguration(ICE_SERVERS).apply {
             tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED
             bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
@@ -39,52 +33,12 @@ class PeerConnectionClient(
             enableDtlsSrtp = true
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
         }
-
         peerConnection = peerConnectionFactory.createPeerConnection(rtcConfiguration, observer)
             ?: error("Cannot Create Peer Connection")
+        peerConnection.addStream(mediaManager.mediaStream)
 
-        // Set INFO libjingle logging.
-        // NOTE: this _must_ happen while |factory| is alive!
         Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
-
-        val mediaStream = peerConnectionFactory.createLocalMediaStream("ARDAMS")
-        mediaStream.addTrack(createAudioTrack())
-        mediaStream.addTrack(createVideoTrack(videoCapturer, localRenderer))
-        peerConnection.addStream(mediaStream)
-
         setVideoMaxBitrate(1700)
-    }
-
-    private fun createAudioTrack(): AudioTrack {
-        val audioSource = peerConnectionFactory.createAudioSource(createAudioConstraints(false))
-        return peerConnectionFactory.createAudioTrack("ARDAMSa0", audioSource) //AUDIO_TRACK_ID
-            .apply { setEnabled(true) }
-    }
-
-    private fun createVideoTrack(
-        videoCapturer: VideoCapturer,
-        localRenderer: VideoSink,
-    ): VideoTrack {
-        // 구글코드엔 videoCapturer.initialize 를 하네.. 뭘까..
-        videoCapturer.startCapture(1280, 720, 30) // video width, height, fps
-        val videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast)
-        val videoTrack = peerConnectionFactory.createVideoTrack("ARDAMSv0", videoSource)
-        //VIDEO_TRACK_ID
-        videoTrack.setEnabled(true)
-        videoTrack.addSink(localRenderer)
-        return videoTrack
-    }
-
-    private fun createAudioConstraints(noAudioProcessing: Boolean): MediaConstraints {
-        if (noAudioProcessing) {
-            return MediaConstraints().apply {
-                mandatory.add(MediaConstraints.KeyValuePair("googEchoCancellation", "false"))
-                mandatory.add(MediaConstraints.KeyValuePair("googAutoGainControl", "false"))
-                mandatory.add(MediaConstraints.KeyValuePair("googHighpassFilter", "false"))
-                mandatory.add(MediaConstraints.KeyValuePair("googNoiseSuppression", "false"))
-            }
-        }
-        return MediaConstraints()
     }
 
     private fun setVideoMaxBitrate(maxBitrateKbps: Int?) {
@@ -114,7 +68,16 @@ class PeerConnectionClient(
         }
     }
 
+    fun attachLocalVideoRenderer(renderer: VideoSink) {
+        mediaManager.attachLocalVideoRenderer(renderer)
+    }
+
+    fun detachLocalVideoRenderer(renderer: VideoSink) {
+        mediaManager.detachLocalVideoRenderer(renderer)
+    }
+
     fun close() = CoroutineScope(Dispatchers.IO).launch {
+        mediaManager.dispose()
         peerConnectionFactory.stopAecDump()
         peerConnectionFactory.dispose()
         peerConnection.dispose()

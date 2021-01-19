@@ -13,6 +13,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../WebRTC-android-example/app/src/main/java/com/skfo763/rtcandroid_example/viewmodel/MainViewModel.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../WebRTC-android-example/rtc/src/main/java/com/skfo763/rtc/manager/VoicePeerManager.kt">
           <value>
             <set />
@@ -209,6 +214,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/presentation/utils/ViewUtils.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/MediaManager.kt">
           <value>
             <set />
           </value>
