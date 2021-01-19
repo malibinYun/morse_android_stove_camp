@@ -68,6 +68,14 @@ class PeerConnectionClient(
         }
     }
 
+    fun setRemoteDescription(sessionDescription: SessionDescription) {
+        val sdpDescription = preferCodec(sessionDescription.description, "VP8", false)
+        //sdpDescription = setStartBitrate(sdpDescription)
+        val remoteDescription = SessionDescription(sessionDescription.type, sdpDescription)
+        peerConnection.setRemoteDescription(null, remoteDescription)
+        // drain 하는거 말고 하는게 없음.
+    }
+
     fun attachLocalVideoRenderer(renderer: VideoSink) {
         mediaManager.attachLocalVideoRenderer(renderer)
     }
@@ -92,25 +100,8 @@ class PeerConnectionClient(
             .setPassword("root")
             .createIceServer()
         private val ICE_SERVERS = listOf(MORSE_TURN_SERVER)
-    }
 
-    private inner class SessionDescriptionProtocolObserver : SdpObserver {
-
-        private var localDescription: SessionDescription? = null
-
-        override fun onCreateSuccess(sessionDescription: SessionDescription) {
-            if (localDescription != null) {
-                printLog("onCreateSuccess / Multiple SDP create.")
-                return
-            }
-            val description = preferCodec(sessionDescription.description, "VP8", false)
-            val localDescription = SessionDescription(sessionDescription.type, description)
-            this.localDescription = localDescription
-            printLog("onCreateSuccess / set local description")
-            // 비동기 동작
-            peerConnection.setLocalDescription(this, localDescription)
-        }
-
+        @JvmStatic
         private fun preferCodec(
             sessionDescription: String,
             codec: String,
@@ -134,6 +125,7 @@ class PeerConnectionClient(
             return descriptions.joinToString("\r\n", postfix = "\r\n")
         }
 
+        @JvmStatic
         private fun movePayloadTypesToFront(
             preferredPayloadTypes: List<String>,
             mediaDescription: String,
@@ -149,6 +141,24 @@ class PeerConnectionClient(
                 addAll(preferredPayloadTypes)
                 addAll(unPreferredPayLoadTypes)
             }.joinToString(" ")
+        }
+    }
+
+    private inner class SessionDescriptionProtocolObserver : SdpObserver {
+
+        private var localDescription: SessionDescription? = null
+
+        override fun onCreateSuccess(sessionDescription: SessionDescription) {
+            if (localDescription != null) {
+                printLog("onCreateSuccess / Multiple SDP create.")
+                return
+            }
+            val description = preferCodec(sessionDescription.description, "VP8", false)
+            val localDescription = SessionDescription(sessionDescription.type, description)
+            this.localDescription = localDescription
+            printLog("onCreateSuccess / set local description")
+            // 비동기 동작
+            peerConnection.setLocalDescription(this, localDescription)
         }
 
         override fun onSetSuccess() {

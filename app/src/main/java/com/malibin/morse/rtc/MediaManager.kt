@@ -19,6 +19,7 @@ class MediaManager(
     private val peerConnectionFactory: PeerConnectionFactory,
 ) {
     val mediaStream = peerConnectionFactory.createLocalMediaStream(MEDIA_STREAM_ID)
+        ?: error("Cannot Create Local Media Stream")
     private val audioTrack = createAudioTrack()
     private val videoTrack = createVideoTrack()
 

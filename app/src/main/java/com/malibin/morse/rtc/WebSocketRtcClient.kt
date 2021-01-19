@@ -92,18 +92,3 @@ class WebSocketRtcClient(
         private val HOST_URI = URI("wss://goto.downsups.kro.kr/call")
     }
 }
-
-//class WebSocketService(uri: URI) : WebSocketClient(uri) {
-//    override fun onOpen(handshakedata: ServerHandshake?) {
-//
-//    }
-//
-//    override fun onMessage(message: String?) {
-//    }
-//
-//    override fun onClose(code: Int, reason: String?, remote: Boolean) {
-//    }
-//
-//    override fun onError(ex: Exception) {
-//    }
-//}

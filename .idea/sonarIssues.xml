@@ -58,6 +58,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/aa.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/broadcaster/BroadCasterActivity.java">
           <value>
             <set />
@@ -69,6 +74,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/rtc_peer/kurento/KurentoPresenterRTCClient.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../kurento/nc-kurento-android/app/src/main/java/com/nhancv/kurentoandroid/temp.kt">
           <value>
             <set />
           </value>

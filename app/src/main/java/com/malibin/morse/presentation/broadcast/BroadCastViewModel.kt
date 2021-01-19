@@ -3,6 +3,7 @@ package com.malibin.morse.presentation.broadcast
 import android.content.Context
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
+import com.malibin.morse.R
 import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.rtc.CreateOfferCallback
 import com.malibin.morse.rtc.MediaManager
@@ -10,8 +11,10 @@ import com.malibin.morse.rtc.PeerConnectionClient
 import com.malibin.morse.rtc.WebSocketCallback
 import com.malibin.morse.rtc.WebSocketRtcClient
 import com.malibin.morse.rtc.createPeerConnectionFactory
+import com.orhanobut.logger.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.java_websocket.handshake.ServerHandshake
+import org.json.JSONObject
 import org.webrtc.DataChannel
 import org.webrtc.EglBase
 import org.webrtc.IceCandidate
@@ -40,6 +43,8 @@ class BroadCastViewModel @ViewModelInject constructor(
         )
         peerConnectionClient.connectPeer(PeerConnectionObserver())
         peerConnectionClient.attachLocalVideoRenderer(localVideoRenderer)
+        rtcClient.setTrustedCertificate(context.resources.openRawResource(R.raw.kurento_example_certification))
+        rtcClient.connect()
     }
 
     fun disconnect() {
@@ -54,7 +59,24 @@ class BroadCastViewModel @ViewModelInject constructor(
         }
 
         override fun onMessage(message: String?) {
+            printLog("onMessage")
+            Logger.json(message)
+            val json = JSONObject(message ?: "")
 
+            when (json["id"]) {
+                "presenterResponse" -> {
+                    val sdp = SessionDescription(
+                        SessionDescription.Type.ANSWER,
+                        json["sdpAnswer"].toString()
+                    )
+                    peerConnectionClient.setRemoteDescription(sdp)
+                }
+                "iceCandidate" -> {
+
+                }
+                else -> {
+                }
+            }
         }
 
         override fun onClose(code: Int, reason: String?, remote: Boolean) {
