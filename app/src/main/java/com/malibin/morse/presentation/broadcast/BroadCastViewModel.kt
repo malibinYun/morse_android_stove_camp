@@ -37,6 +37,10 @@ class BroadCastViewModel @ViewModelInject constructor(
         peerConnectionClient.connectPeer(videoCapturer, localRenderer, PeerConnectionObserver())
     }
 
+    fun disconnect() {
+
+    }
+
     private inner class WebSocketCallbackImpl : WebSocketCallback {
         override fun onOpen(handshake: ServerHandshake?) {
             printLog("Socket Opened")

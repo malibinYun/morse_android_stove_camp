@@ -1,6 +1,9 @@
 package com.malibin.morse.rtc
 
 import com.malibin.morse.presentation.utils.printLog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
@@ -109,6 +112,14 @@ class PeerConnectionClient(
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
         }
+    }
+
+    fun close() = CoroutineScope(Dispatchers.IO).launch {
+        peerConnectionFactory.stopAecDump()
+        peerConnectionFactory.dispose()
+        peerConnection.dispose()
+        PeerConnectionFactory.stopInternalTracingCapture()
+        PeerConnectionFactory.shutdownInternalTracer()
     }
 
     companion object {

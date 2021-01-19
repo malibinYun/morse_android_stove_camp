@@ -8,6 +8,16 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../WebRTC-android-example/app/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../WebRTC-android-example/rtc/src/main/java/com/skfo763/rtc/manager/VoicePeerManager.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../WebRTC/imported-webrtc-example/app/src/main/java/org/appspot/apprtc/CallActivity.java">
           <value>
             <set />

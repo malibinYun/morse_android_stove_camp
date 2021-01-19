@@ -33,7 +33,7 @@ class BroadCastActivity : AppCompatActivity() {
         setContentView(binding.root)
         initView(binding)
 
-        if (isPermissionsGranted()) showToast("이미 권한 부여함")
+        if (isPermissionsGranted()) startBroadCast()
         else askPermissions()
     }
 
@@ -58,9 +58,13 @@ class BroadCastActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             val isAllPermissionGranted =
                 grantResults.isNotEmpty() && grantResults.all { it == PERMISSION_GRANTED }
-            if (isAllPermissionGranted) showToast("권한부여됨")
+            if (isAllPermissionGranted) startBroadCast()
             else showPermissionRejected()
         }
+    }
+
+    private fun startBroadCast() {
+        broadCastViewModel.connectPeer(EglBase.create(), createVideoCapturer(), getLocalRenderder())
     }
 
     private fun showPermissionRejected() {
