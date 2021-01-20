@@ -62,11 +62,13 @@ class BroadCastViewModel @ViewModelInject constructor(
             if (response == null) return
 
             if (response.responseId == ID.PRESENTER_RESPONSE) {
+                printLog("onMessage PRESENTER_RESPONSE called")
                 val sdp = SessionDescription(SessionDescription.Type.ANSWER, response.sdpAnswer)
                 peerConnectionClient.setRemoteDescription(sdp)
             }
 
             if (response.responseId == ID.ICE_CANDIDATE) {
+                printLog("onMessage ICE_CANDIDATE called")
                 val candidateResponse = response.candidate ?: error("candidate cannot be null")
                 peerConnectionClient.addRemoteIceCandidate(candidateResponse.toIceCandidate())
             }

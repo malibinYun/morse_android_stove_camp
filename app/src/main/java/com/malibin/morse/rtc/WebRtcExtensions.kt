@@ -11,7 +11,7 @@ import org.webrtc.IceCandidate
 fun IceCandidate.toJson(): JSONObject {
     return JSONObject().apply {
         put("candidate", this@toJson.sdp)
-        put("candidate", this@toJson.sdpMid)
-        put("candidate", this@toJson.sdpMLineIndex)
+        put("sdpMid", this@toJson.sdpMid)
+        put("sdpMLineIndex", this@toJson.sdpMLineIndex)
     }
 }

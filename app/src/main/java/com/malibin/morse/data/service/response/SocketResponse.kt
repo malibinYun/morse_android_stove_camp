@@ -16,5 +16,6 @@ data class SocketResponse(
     val success: Boolean,
     val from: String?,
 ) {
-    val responseId: ID = ID.findBy(id)
+    val responseId: ID
+        get() = ID.findBy(id)
 }

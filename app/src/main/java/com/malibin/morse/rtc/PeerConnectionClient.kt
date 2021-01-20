@@ -1,5 +1,6 @@
 package com.malibin.morse.rtc
 
+import com.malibin.morse.Temp
 import com.malibin.morse.presentation.utils.printLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,16 +30,22 @@ class PeerConnectionClient(
 
     private lateinit var dataChannel: DataChannel
 
+    // 이노메 옵저버 위치 다시 생각해봐야함
+    private val sdpObserver = SessionDescriptionProtocolObserver()
+
     fun connectPeer(observer: PeerConnection.Observer) {
         val rtcConfiguration = PeerConnection.RTCConfiguration(ICE_SERVERS).apply {
             tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED
             bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
+            rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.REQUIRE
             continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
+            keyType = PeerConnection.KeyType.ECDSA
             enableDtlsSrtp = true
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
         }
         peerConnection = peerConnectionFactory.createPeerConnection(rtcConfiguration, observer)
             ?: error("Cannot Create Peer Connection")
+
         val mediaStreamLabels = listOf("ARDAMS")
         peerConnection.addTrack(mediaManager.audioTrack, mediaStreamLabels)
         peerConnection.addTrack(mediaManager.videoTrack, mediaStreamLabels)
@@ -65,7 +72,7 @@ class PeerConnectionClient(
 
     fun createOffer(callback: CreateOfferCallback) {
         this.createOfferCallback = callback
-        val sdpObserver = SessionDescriptionProtocolObserver()
+//        val sdpObserver = SessionDescriptionProtocolObserver()
         val sdpMediaConstraints = createSdpConstraints()
         peerConnection.createOffer(sdpObserver, sdpMediaConstraints)
     }
@@ -78,15 +85,19 @@ class PeerConnectionClient(
     }
 
     fun setRemoteDescription(sessionDescription: SessionDescription) {
+        printLog("setRemoteDescription Called")
         val sdpDescription = preferCodec(sessionDescription.description, "VP8", false)
         //sdpDescription = setStartBitrate(sdpDescription)
+//        val temp = Temp.setStartBitrate("opus", false, sdpDescription, 32)
         val remoteDescription = SessionDescription(sessionDescription.type, sdpDescription)
-        peerConnection.setRemoteDescription(null, remoteDescription)
+        peerConnection.setRemoteDescription(sdpObserver, remoteDescription)
+        printLog("Remote SDP set succesfully")
         // drain 하는거 말고 하는게 없음.
     }
 
     fun addRemoteIceCandidate(iceCandidate: IceCandidate) {
         CoroutineScope(Dispatchers.IO).launch {
+            printLog("addRemoteIceCandidate called")
             peerConnection.addIceCandidate(iceCandidate)
         }
     }
@@ -180,7 +191,7 @@ class PeerConnectionClient(
         override fun onSetSuccess() {
             printLog("onSetSuccess")
             if (peerConnection.remoteDescription == null) {
-                printLog("onSetSuccess // peerConnection.remoteDescription == null")
+                printLog("onSetSuccess // Local SDP set succesfully")
                 val localDescription = localDescription ?: error("localDescription cannot be null")
                 createOfferCallback?.onOfferSetSuccess(localDescription)
                 return

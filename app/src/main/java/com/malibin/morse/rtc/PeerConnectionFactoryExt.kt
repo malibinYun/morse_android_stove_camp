@@ -5,6 +5,7 @@ import com.malibin.morse.presentation.utils.printLog
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
+import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.audio.AudioDeviceModule
 import org.webrtc.audio.JavaAudioDeviceModule
@@ -18,10 +19,8 @@ fun createPeerConnectionFactory(
     context: Context,
     eglBase: EglBase
 ): PeerConnectionFactory {
-
     val fieldTrials = StringBuilder()
     fieldTrials.append("WebRTC-IntelVP8/Enabled/")
-    //VIDEO_VP8_INTEL_HW_ENCODER_FIELDTRIAL
 
     PeerConnectionFactory.initialize(
         PeerConnectionFactory.InitializationOptions.builder(context)
@@ -30,12 +29,12 @@ fun createPeerConnectionFactory(
             .createInitializationOptions()
     )
 //  WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true)
-
     val audioDeviceModule = createJavaAudioDeviceModule(context)
     val encoderFactory = DefaultVideoEncoderFactory(eglBase.eglBaseContext, true, false)
     val decoderFactory = DefaultVideoDecoderFactory(eglBase.eglBaseContext)
 
     return PeerConnectionFactory.builder()
+        .setOptions(PeerConnectionFactory.Options())
         .setAudioDeviceModule(audioDeviceModule)
         .setVideoEncoderFactory(encoderFactory)
         .setVideoDecoderFactory(decoderFactory)

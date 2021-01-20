@@ -194,10 +194,13 @@ videoCapturer를 만들어야해서 (아니 근데 왜 이름이 captor가 아�
 
      * 내부적으로 peerConnection.addIceCandidate 호출.
 
-     * peerConnection이 null이거나 isError 인경우는 queuedRemoteCandidates에 쌓아둠.
-
+       * peerConnection.addIceCandidate를 호출하는 경우는 Local, Remote SDP가 모두 setting 되었을 때 부터 시작해야한대.
+  * 전부 비동기로 돌기에 queuedRemote.... 이놈이 있는거고, 그래서 전부 세팅이 되면 이걸 전부 consume함. 
+     
+* peerConnection이 null이거나 isError 인경우는 queuedRemoteCandidates에 쌓아둠.
+     
      * 추후에 queuedRemoteCandidates는 drainCandidate호출하면서 peerConnection.addIceCandidate 호출하고 null로 치환됨.
-
+     
      * 그러다가 (PeerConnection.Observer) onIceConnectionChange 에서 IceConnectionState: CONNECTED 이게 뜸.
 
 
