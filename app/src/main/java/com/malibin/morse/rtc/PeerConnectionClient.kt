@@ -4,6 +4,7 @@ import com.malibin.morse.presentation.utils.printLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
@@ -26,6 +27,8 @@ class PeerConnectionClient(
     private lateinit var peerConnection: PeerConnection
     private var createOfferCallback: CreateOfferCallback? = null
 
+    private lateinit var dataChannel: DataChannel
+
     fun connectPeer(observer: PeerConnection.Observer) {
         val rtcConfiguration = PeerConnection.RTCConfiguration(ICE_SERVERS).apply {
             tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED
@@ -39,6 +42,9 @@ class PeerConnectionClient(
         val mediaStreamLabels = listOf("ARDAMS")
         peerConnection.addTrack(mediaManager.audioTrack, mediaStreamLabels)
         peerConnection.addTrack(mediaManager.videoTrack, mediaStreamLabels)
+
+        val dataChannelInit = DataChannel.Init()
+        dataChannel = peerConnection.createDataChannel("dataChannelLabel", dataChannelInit)
 
         Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
         setVideoMaxBitrate(1700)
@@ -95,6 +101,7 @@ class PeerConnectionClient(
 
     fun close() = CoroutineScope(Dispatchers.IO).launch {
         mediaManager.dispose()
+        dataChannel.dispose()
         peerConnectionFactory.stopAecDump()
         peerConnectionFactory.dispose()
         peerConnection.dispose()

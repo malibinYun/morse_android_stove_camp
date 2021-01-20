@@ -130,14 +130,37 @@ class BroadCastViewModel @ViewModelInject constructor(
         }
         // 중국인 앱 봐야함
 
-        override fun onRemoveStream(mediaStream: MediaStream?) {}
+        override fun onRemoveStream(mediaStream: MediaStream?) {
+            printLog("onRemoveStream // $mediaStream")
+        }
         // 중국인 앱 봐야함
 
-        override fun onAddTrack(rtpReceiver: RtpReceiver?, mediaStreams: Array<MediaStream>?) {}
+        override fun onAddTrack(rtpReceiver: RtpReceiver?, mediaStreams: Array<MediaStream>?) {
+            printLog("onAddTrack")
+        }
 
-        override fun onDataChannel(dataChannel: DataChannel?) {}
-        // 일단 데이터 채널 꺼뒀으니 일단은 ...
+        override fun onDataChannel(dataChannel: DataChannel?) {
+            printLog("onDataChannel // DataChannel opened")
 
-        override fun onRenegotiationNeeded() {}
+            dataChannel?.registerObserver(object : DataChannel.Observer {
+                override fun onMessage(buffer: DataChannel.Buffer?) {
+                    val byteArray = ByteArray(buffer?.data?.capacity() ?: return)
+                    buffer.data.get(byteArray)
+                    printLog("DataChannel onMessage : $byteArray")
+                }
+
+                override fun onBufferedAmountChange(previousAmount: Long) {
+                    printLog("DataChannel onBufferedAmountChange // label : ${dataChannel.label()}, state : ${dataChannel.state()}")
+                }
+
+                override fun onStateChange() {
+                    printLog("DataChannel onStateChange // label : ${dataChannel.label()}, state : ${dataChannel.state()}")
+                }
+            })
+        }
+
+        override fun onRenegotiationNeeded() {
+            printLog("onRenegotiationNeeded")
+        }
     }
 }
