@@ -4,6 +4,7 @@ import com.malibin.morse.presentation.utils.printLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.webrtc.IceCandidate
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnection
@@ -35,7 +36,9 @@ class PeerConnectionClient(
         }
         peerConnection = peerConnectionFactory.createPeerConnection(rtcConfiguration, observer)
             ?: error("Cannot Create Peer Connection")
-        peerConnection.addStream(mediaManager.mediaStream)
+        val mediaStreamLabels = listOf("ARDAMS")
+        peerConnection.addTrack(mediaManager.audioTrack, mediaStreamLabels)
+        peerConnection.addTrack(mediaManager.videoTrack, mediaStreamLabels)
 
         Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
         setVideoMaxBitrate(1700)
@@ -74,6 +77,12 @@ class PeerConnectionClient(
         val remoteDescription = SessionDescription(sessionDescription.type, sdpDescription)
         peerConnection.setRemoteDescription(null, remoteDescription)
         // drain 하는거 말고 하는게 없음.
+    }
+
+    fun addRemoteIceCandidate(iceCandidate: IceCandidate) {
+        CoroutineScope(Dispatchers.IO).launch {
+            peerConnection.addIceCandidate(iceCandidate)
+        }
     }
 
     fun attachLocalVideoRenderer(renderer: VideoSink) {
@@ -115,14 +124,14 @@ class PeerConnectionClient(
             val codecRegex = Regex("^a=rtpmap:(\\d+) $codec(/\\d+)+[\r]?$")
             val codecPayloadTypes = descriptions
                 .mapNotNull { codecRegex.find(it) }
-                .map { it.value }
+                .map { it.groupValues[1] }
 
             val updatedMediaDescription =
                 movePayloadTypesToFront(codecPayloadTypes, mediaDescription)
 
             val mediaDescriptionIndex = descriptions.indexOf(mediaDescription)
             descriptions[mediaDescriptionIndex] = updatedMediaDescription
-            return descriptions.joinToString("\r\n", postfix = "\r\n")
+            return descriptions.joinToString("\r\n")
         }
 
         @JvmStatic
@@ -156,13 +165,15 @@ class PeerConnectionClient(
             val description = preferCodec(sessionDescription.description, "VP8", false)
             val localDescription = SessionDescription(sessionDescription.type, description)
             this.localDescription = localDescription
-            printLog("onCreateSuccess / set local description")
+            printLog("onCreateSuccess // set local description")
             // 비동기 동작
             peerConnection.setLocalDescription(this, localDescription)
         }
 
         override fun onSetSuccess() {
+            printLog("onSetSuccess")
             if (peerConnection.remoteDescription == null) {
+                printLog("onSetSuccess // peerConnection.remoteDescription == null")
                 val localDescription = localDescription ?: error("localDescription cannot be null")
                 createOfferCallback?.onOfferSetSuccess(localDescription)
                 return

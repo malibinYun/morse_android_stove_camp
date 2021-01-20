@@ -1,5 +1,6 @@
 package com.malibin.morse.rtc
 
+import com.malibin.morse.data.service.response.SocketResponse
 import org.java_websocket.handshake.ServerHandshake
 
 /**
@@ -11,7 +12,7 @@ interface WebSocketCallback {
 
     fun onOpen(handshake: ServerHandshake?)
 
-    fun onMessage(message: String?)
+    fun onMessage(response: SocketResponse?)
 
     fun onClose(code: Int, reason: String?, remote: Boolean)
 

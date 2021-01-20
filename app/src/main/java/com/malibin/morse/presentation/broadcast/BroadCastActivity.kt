@@ -9,6 +9,7 @@ import com.malibin.morse.R
 import com.malibin.morse.databinding.ActivityBroadCastBinding
 import com.malibin.morse.presentation.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import com.malibin.morse.localSdp
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
 import org.webrtc.VideoSink
@@ -37,7 +38,7 @@ class BroadCastActivity : AppCompatActivity() {
     }
 
     private fun hasNoCamera(): Boolean =
-        packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
+        !packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
 
     private fun initView(binding: ActivityBroadCastBinding) {
         binding.windowBroadcastSurface.apply {

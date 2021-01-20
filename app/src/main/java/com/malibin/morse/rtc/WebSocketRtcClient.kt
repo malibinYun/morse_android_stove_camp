@@ -1,5 +1,7 @@
 package com.malibin.morse.rtc
 
+import com.google.gson.Gson
+import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
 import java.io.InputStream
 import java.net.URI
@@ -21,6 +23,8 @@ import org.webrtc.SessionDescription
 class WebSocketRtcClient(
     private val callback: WebSocketCallback
 ) : WebSocketClient(HOST_URI), RtcClient {
+
+    private val gson: Gson = Gson()
 
     fun setTrustedCertificate(certificateInputStream: InputStream?) {
         if (isOpen) error("cannot set certificate when socket opened")
@@ -48,7 +52,8 @@ class WebSocketRtcClient(
     }
 
     override fun onMessage(message: String?) {
-        callback.onMessage(message)
+        val response = gson.fromJson(message,SocketResponse::class.java)
+        callback.onMessage(response)
     }
 
     override fun onClose(code: Int, reason: String?, remote: Boolean) {

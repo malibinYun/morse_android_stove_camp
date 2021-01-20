@@ -78,13 +78,30 @@ onCreateSuccess() 랑 onSetSuccess() 하.. 근데 이놈 두놈 모두 구글이
   * 다른 곳에서도 preferCodec 함수를 호출한다. 어디선가... 흠 옵저버 밖에 있어야하는 메서드들인것 같다.
   * 수정하는 코드
     * preferCodec을 호출해서 sdp의 description(String) 부분을 수정한다.
+
     * description을 "\\r\\n"으로 split 하고 mediaDescription에 해당하는 라인을 찾는다.
+
     * 그리고 description에 "^a=rtpmap:(\\d+) " + codec + "(/\\d+)+[\r]?$" 이거에 해당하는 라인을 모두 찾는다 => payLoad Types
+
     * mediaDesciption에 해당하는 라인을 또 " "로 split한다.
+
     * 위 나눠진 파트들에서 앞 3개와 나머지 사이에 무언가를 넣는 작업을 한다.
+
     * 앞 3개를 뺀 나머지에서는 payLoadTypes를 모두 제거한다.
+
     * 맨앞 + payLoadTypes + payLoadTypes제거한 것들 해서 payload를 앞으로 옮기는 작업을 한다.
+
     * 그리고 모두 " "로 합치고, 마지막엔 딜리미터 없이.
+
+      * >local offer sdp 에서 보면
+        >
+        >m=video 9 UDP/TLS/RTP/SAVPF 96 97 98 99 100 101 127 123 125 
+        >
+        >요 라인을 찾고, a=rtpmap:96 VP8/90000 요 라인을 찾음.
+        >
+        >VP8이 내가 찾고자 한 코덱임 바로 위에서 96이라는 숫자를 꺼낸뒤, 
+        >
+        >첫번째 줄에 있는 96을 숫자중에서 가장 앞으로 보내고자 만드는 함수들임....
   * audio codec이 ISAC 이면 sdp 수정
   * 비디오 콜이 enable 되어있으면 무조건 sdp 수정. 코덱은 거기에 맞춰서.
 
@@ -112,7 +129,9 @@ videoCapturer를 만들어야해서 (아니 근데 왜 이름이 captor가 아�
 
 이놈이 Audio, Video Track들을 생성 및 mediaStream을 만들어내는 객체. 밖에서는 peerConnctionClient가 해당 mediaStream을 꺼내서 stream을 추가하는 구조. 
 
-
+* VideoCapturer는 startcapture를 부르기 전에 반드시 initalize를 호출 해줘야한다.안그러면 exception 터짐.
+* peerConnection.addStream 쓰지 말란다.
+  * peerConnection,addTrack을 써서 audio, video 각각 추가해줬다.
 
 
 
@@ -181,3 +200,14 @@ videoCapturer를 만들어야해서 (아니 근데 왜 이름이 captor가 아�
 
      * 그러다가 (PeerConnection.Observer) onIceConnectionChange 에서 IceConnectionState: CONNECTED 이게 뜸.
 
+
+
+
+
+## 기타등등
+
+``` 
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
+
+이 퍼미션을 필요로 하네. 네이티브콜에서 필요한걸로 추측됨.

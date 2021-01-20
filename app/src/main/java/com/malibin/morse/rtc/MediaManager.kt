@@ -3,10 +3,13 @@ package com.malibin.morse.rtc
 import android.content.Context
 import org.webrtc.AudioTrack
 import org.webrtc.Camera2Enumerator
+import org.webrtc.EglBase
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnectionFactory
+import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoCapturer
 import org.webrtc.VideoSink
+import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
 
 /**
@@ -15,18 +18,12 @@ import org.webrtc.VideoTrack
  */
 
 class MediaManager(
+    private val eglBase: EglBase,
     private val context: Context,
     private val peerConnectionFactory: PeerConnectionFactory,
 ) {
-    val mediaStream = peerConnectionFactory.createLocalMediaStream(MEDIA_STREAM_ID)
-        ?: error("Cannot Create Local Media Stream")
-    private val audioTrack = createAudioTrack()
-    private val videoTrack = createVideoTrack()
-
-    init {
-        mediaStream.addTrack(audioTrack)
-        mediaStream.addTrack(videoTrack)
-    }
+    val audioTrack = createAudioTrack()
+    val videoTrack = createVideoTrack()
 
     private fun createAudioTrack(): AudioTrack {
         val audioSource = peerConnectionFactory.createAudioSource(createAudioConstraints(false))
@@ -46,15 +43,21 @@ class MediaManager(
         return MediaConstraints()
     }
 
-    private fun createVideoTrack(
-    ): VideoTrack {
-        // 구글코드엔 videoCapturer.initialize 를 하네.. 뭘까..
-        val videoCapturer = createVideoCapturer()
-        videoCapturer.startCapture(1280, 720, 30) // video width, height, fps
-        val videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast)
+    private fun createVideoTrack(): VideoTrack {
+        val videoSource = createVideoSource()
         val videoTrack = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource)
         videoTrack.setEnabled(true)
         return videoTrack
+    }
+
+    private fun createVideoSource(): VideoSource {
+        val surfaceTextureHelper =
+            SurfaceTextureHelper.create("CaptureThread", eglBase.eglBaseContext)
+        val videoCapturer = createVideoCapturer()
+        val videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast)
+        videoCapturer.initialize(surfaceTextureHelper, context, videoSource.capturerObserver)
+        videoCapturer.startCapture(1280, 720, 30) // video width, height, fps
+        return videoSource
     }
 
     private fun createVideoCapturer(): VideoCapturer {
@@ -76,9 +79,6 @@ class MediaManager(
     fun dispose() {
         audioTrack.dispose()
         videoTrack.dispose()
-        mediaStream.removeTrack(audioTrack)
-        mediaStream.removeTrack(videoTrack)
-        mediaStream.dispose()
     }
 
     companion object {
