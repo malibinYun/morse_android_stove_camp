@@ -68,7 +68,9 @@ onCreateSuccess() 랑 onSetSuccess() 하.. 근데 이놈 두놈 모두 구글이
 
 이게 생각보다 중요하다. 이걸 통해서 sdp 가 왔다 갔다 한다. 제대로 만들어야하는 부분.
 
+createOffer, createAnswer 등 sdp 를 만들어 내는 역할을 한다. 이 메서드들을 호출 할 때 이 SdpObserver를 집어넣어주어야만 한다. create가 완료 된 경우 onCreateSuccess() 콜백이 호출 되며, 생성된 sdp 가 파라미터로 떨어진다.
 
+setLocalDescription / setRemoteDescription을 호출 할 때 이 observer를 넣어야만 한다. set이 완료되면, onSetSuccess() 메서드가 콜백으로 떨어진다. 아무래도 세팅하는게 비동기로 동작하는 느낌이니, set...Desciption 다음에 바로 메서드들을 호출하는건 위험하다고 판단이 된다.
 
 * onCreateSuccess() 
   * 이놈은 events 의존성이 없긴 하네. 얘는 콜백 없이도 만드는게 가능하다. 까다로운게 있다면, sdp를 직접 수정하는 코드들이 있다는거?
@@ -196,9 +198,9 @@ videoCapturer를 만들어야해서 (아니 근데 왜 이름이 captor가 아�
 
        * peerConnection.addIceCandidate를 호출하는 경우는 Local, Remote SDP가 모두 setting 되었을 때 부터 시작해야한대.
   * 전부 비동기로 돌기에 queuedRemote.... 이놈이 있는거고, 그래서 전부 세팅이 되면 이걸 전부 consume함. 
-     
+  
 * peerConnection이 null이거나 isError 인경우는 queuedRemoteCandidates에 쌓아둠.
-     
+  
      * 추후에 queuedRemoteCandidates는 drainCandidate호출하면서 peerConnection.addIceCandidate 호출하고 null로 치환됨.
      
      * 그러다가 (PeerConnection.Observer) onIceConnectionChange 에서 IceConnectionState: CONNECTED 이게 뜸.
