@@ -17,17 +17,17 @@ import org.webrtc.VideoTrack
  * on 1월 19, 2021
  */
 
-class MediaManager(
-    private val eglBase: EglBase,
-    private val context: Context,
-    private val peerConnectionFactory: PeerConnectionFactory,
+class MediaTrackManager(
+    eglBase: EglBase,
+    context: Context,
+    factory: PeerConnectionFactory,
 ) {
-    val audioTrack = createAudioTrack()
-    val videoTrack = createVideoTrack()
+    val audioTrack: AudioTrack by lazy { createAudioTrack(factory) }
+    val videoTrack: VideoTrack by lazy { createVideoTrack(factory, eglBase, context) }
 
-    private fun createAudioTrack(): AudioTrack {
-        val audioSource = peerConnectionFactory.createAudioSource(createAudioConstraints(false))
-        return peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource) //AUDIO_TRACK_ID
+    private fun createAudioTrack(factory: PeerConnectionFactory): AudioTrack {
+        val audioSource = factory.createAudioSource(createAudioConstraints(false))
+        return factory.createAudioTrack(AUDIO_TRACK_ID, audioSource) //AUDIO_TRACK_ID
             .apply { setEnabled(true) }
     }
 
@@ -43,24 +43,32 @@ class MediaManager(
         return MediaConstraints()
     }
 
-    private fun createVideoTrack(): VideoTrack {
-        val videoSource = createVideoSource()
-        val videoTrack = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource)
+    private fun createVideoTrack(
+        factory: PeerConnectionFactory,
+        eglBase: EglBase,
+        context: Context,
+    ): VideoTrack {
+        val videoSource = createVideoSource(factory, eglBase, context)
+        val videoTrack = factory.createVideoTrack(VIDEO_TRACK_ID, videoSource)
         videoTrack.setEnabled(true)
         return videoTrack
     }
 
-    private fun createVideoSource(): VideoSource {
+    private fun createVideoSource(
+        factory: PeerConnectionFactory,
+        eglBase: EglBase,
+        context: Context,
+    ): VideoSource {
         val surfaceTextureHelper =
             SurfaceTextureHelper.create("CaptureThread", eglBase.eglBaseContext)
-        val videoCapturer = createVideoCapturer()
-        val videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast)
+        val videoCapturer = createVideoCapturer(context)
+        val videoSource = factory.createVideoSource(videoCapturer.isScreencast)
         videoCapturer.initialize(surfaceTextureHelper, context, videoSource.capturerObserver)
         videoCapturer.startCapture(1280, 720, 30) // video width, height, fps
         return videoSource
     }
 
-    private fun createVideoCapturer(): VideoCapturer {
+    private fun createVideoCapturer(context:Context): VideoCapturer {
         val cameraEnumerator = Camera2Enumerator(context)
         val deviceName = cameraEnumerator.deviceNames.find { cameraEnumerator.isFrontFacing(it) }
             ?: cameraEnumerator.deviceNames.find { cameraEnumerator.isBackFacing(it) }

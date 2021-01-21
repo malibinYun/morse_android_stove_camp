@@ -64,7 +64,7 @@ class BroadCastActivity : AppCompatActivity() {
     }
 
     private fun startBroadCast() {
-        broadCastViewModel.connectPeer(rootEgl, getLocalRenderer())
+        broadCastViewModel.connect(rootEgl, getLocalRenderer())
     }
 
     private fun showPermissionRejected() {

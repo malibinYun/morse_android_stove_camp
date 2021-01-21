@@ -137,6 +137,9 @@ videoCapturer를 만들어야해서 (아니 근데 왜 이름이 captor가 아�
 
 
 
+* VideoCapturer -> VideoSource -> VideoTrack.
+* 
+
 
 
 
@@ -216,3 +219,9 @@ videoCapturer를 만들어야해서 (아니 근데 왜 이름이 captor가 아�
 ```
 
 이 퍼미션을 필요로 하네. 네이티브콜에서 필요한걸로 추측됨.
+
+
+
+remoteRenderer는 (서버로부터 오는 영상을 받아서 보여주는 뷰)
+
+onAddStream에서만 추가한다.

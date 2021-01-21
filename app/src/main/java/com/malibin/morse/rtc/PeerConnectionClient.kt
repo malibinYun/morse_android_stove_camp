@@ -1,10 +1,10 @@
 package com.malibin.morse.rtc
 
-import com.malibin.morse.Temp
 import com.malibin.morse.presentation.utils.printLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.Logging
@@ -15,6 +15,7 @@ import org.webrtc.RtpSender
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 import org.webrtc.VideoSink
+import org.webrtc.VideoTrack
 
 /**
  * Created By Malibin
@@ -22,36 +23,21 @@ import org.webrtc.VideoSink
  */
 
 class PeerConnectionClient(
-    private val peerConnectionFactory: PeerConnectionFactory,
-    private val mediaManager: MediaManager,
+    private val peerConnection: PeerConnection,
 ) {
-    private lateinit var peerConnection: PeerConnection
     private var createOfferCallback: CreateOfferCallback? = null
 
-    private lateinit var dataChannel: DataChannel
+    private val dataChannel: DataChannel by lazy {
+        peerConnection.createDataChannel("dataChannelLabel", DataChannel.Init())
+    }
 
     // 이노메 옵저버 위치 다시 생각해봐야함
     private val sdpObserver = SessionDescriptionProtocolObserver()
 
-    fun connectPeer(observer: PeerConnection.Observer) {
-        val rtcConfiguration = PeerConnection.RTCConfiguration(ICE_SERVERS).apply {
-            tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED
-            bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
-            rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.REQUIRE
-            continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
-            keyType = PeerConnection.KeyType.ECDSA
-            enableDtlsSrtp = true
-            sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-        }
-        peerConnection = peerConnectionFactory.createPeerConnection(rtcConfiguration, observer)
-            ?: error("Cannot Create Peer Connection")
-
+    fun addTracks(audioTrack: AudioTrack, videoTrack: VideoTrack) {
         val mediaStreamLabels = listOf("ARDAMS")
-        peerConnection.addTrack(mediaManager.audioTrack, mediaStreamLabels)
-        peerConnection.addTrack(mediaManager.videoTrack, mediaStreamLabels)
-
-        val dataChannelInit = DataChannel.Init()
-        dataChannel = peerConnection.createDataChannel("dataChannelLabel", dataChannelInit)
+        peerConnection.addTrack(audioTrack, mediaStreamLabels)
+        peerConnection.addTrack(videoTrack, mediaStreamLabels)
 
         Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
         setVideoMaxBitrate(1700)
@@ -102,19 +88,8 @@ class PeerConnectionClient(
         }
     }
 
-    fun attachLocalVideoRenderer(renderer: VideoSink) {
-        mediaManager.attachLocalVideoRenderer(renderer)
-    }
-
-    fun detachLocalVideoRenderer(renderer: VideoSink) {
-        mediaManager.detachLocalVideoRenderer(renderer)
-    }
-
     fun close() = CoroutineScope(Dispatchers.IO).launch {
-        mediaManager.dispose()
         dataChannel.dispose()
-        peerConnectionFactory.stopAecDump()
-        peerConnectionFactory.dispose()
         peerConnection.dispose()
         PeerConnectionFactory.stopInternalTracingCapture()
         PeerConnectionFactory.shutdownInternalTracer()

@@ -23,6 +23,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../WebRTC-android-example/rtc/src/main/java/com/skfo763/rtc/manager/audio/AudioStatusInterface.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../WebRTC/imported-webrtc-example/app/src/main/java/org/appspot/apprtc/CallActivity.java">
           <value>
             <set />
@@ -93,7 +98,17 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/malibin/morse/presentation/broadcast/BroadCastViewModel.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/config/PeerConnectionFactoryModule.kt">
           <value>
             <set />
           </value>
@@ -104,6 +119,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/data/MorseService.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/data/StreamingMode.kt">
           <value>
             <set />
           </value>
@@ -248,6 +268,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/MediaTrackManager.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/MorsePeerConnectionFactory.kt">
           <value>
             <set />
@@ -264,6 +289,16 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/RtcClient.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/WebRtcClient.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/malibin/morse/rtc/WebSocketCallback.kt">
           <value>
             <set />
           </value>
