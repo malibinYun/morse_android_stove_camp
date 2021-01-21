@@ -2,6 +2,7 @@ package com.malibin.morse.rtc
 
 import android.content.Context
 import com.malibin.morse.R
+import com.malibin.morse.data.StreamingMode
 import com.malibin.morse.data.entity.ID
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
@@ -62,8 +63,10 @@ class WebRtcClient(
         }
     }
 
-    fun connectPeer(videoRenderer: VideoSink) {
-        peerConnectionClient.addTracks(mediaTrackManager.audioTrack, mediaTrackManager.videoTrack)
+    fun connectPeer(videoRenderer: VideoSink, mode: StreamingMode) {
+        if(mode == StreamingMode.BROADCAST){
+            peerConnectionClient.addTracks(mediaTrackManager.audioTrack, mediaTrackManager.videoTrack)
+        }
         mediaTrackManager.attachLocalVideoRenderer(videoRenderer)
         webSocketRtcClient.setTrustedCertificate(context.resources.openRawResource(R.raw.kurento_example_certification))
         webSocketRtcClient.connectRoom()

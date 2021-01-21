@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import com.malibin.morse.R
+import com.malibin.morse.data.StreamingMode
 import com.malibin.morse.data.entity.ID
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
@@ -39,7 +40,7 @@ class BroadCastViewModel @ViewModelInject constructor(
 
     fun connect(eglBase: EglBase, videoRenderer: VideoSink) {
         webRtcClient = WebRtcClient(context, eglBase, WebRtcClientEventsImpl())
-        webRtcClient.connectPeer(videoRenderer)
+        webRtcClient.connectPeer(videoRenderer, StreamingMode.BROADCAST)
     }
 
     fun disconnect() {
