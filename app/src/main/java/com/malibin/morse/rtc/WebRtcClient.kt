@@ -195,12 +195,10 @@ class WebRtcClient(
             remoteTrack.addSink(remoteRenderer)
             Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
         }
-        // 중국인 앱 봐야함
 
         override fun onRemoveStream(mediaStream: MediaStream?) {
             printLog("onRemoveStream // $mediaStream")
         }
-        // 중국인 앱 봐야함
 
         override fun onAddTrack(rtpReceiver: RtpReceiver?, mediaStreams: Array<MediaStream>?) {
             printLog("onAddTrack")
