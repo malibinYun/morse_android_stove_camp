@@ -74,7 +74,6 @@ class AuthRepository @Inject constructor(
         }
     }
 
-
     suspend fun refreshTokens(refreshToken: String): LoginResponse? {
         withContext(Dispatchers.IO) {
             val response = morseService.refreshToken(refreshToken)

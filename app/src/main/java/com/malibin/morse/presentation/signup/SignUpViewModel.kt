@@ -56,6 +56,14 @@ class SignUpViewModel @ViewModelInject constructor() : ViewModel() {
         return password.value != passwordCheck.value
     }
 
+    //    private fun isNotVerifyEmail(email: String): Boolean {
+    //        return !Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    //    }
+    //
+    //    private fun isNotVerifyPassword(password: String): Boolean {
+    //        password
+    //    }
+
     companion object {
         const val PAGE_COUNT = 2
         const val MAX_PAGE_INDEX = PAGE_COUNT - 1

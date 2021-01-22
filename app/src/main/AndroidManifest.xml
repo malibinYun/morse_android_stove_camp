@@ -21,7 +21,7 @@
         <activity android:name=".presentation.viewer.ViewerActivity" />
         <activity android:name=".presentation.broadcast.BroadCastActivity" />
         <activity android:name=".presentation.signup.SignUpActivity" />
-        <activity android:name=".presentation.LoginActivity">
+        <activity android:name=".presentation.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
