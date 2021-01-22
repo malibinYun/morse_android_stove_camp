@@ -3,17 +3,17 @@ package com.malibin.morse.rtc
 import com.google.gson.Gson
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
+import org.java_websocket.client.WebSocketClient
+import org.java_websocket.handshake.ServerHandshake
+import org.json.JSONObject
+import org.webrtc.IceCandidate
+import org.webrtc.SessionDescription
 import java.io.InputStream
 import java.net.URI
 import java.security.KeyStore
 import java.security.cert.CertificateFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
-import org.java_websocket.client.WebSocketClient
-import org.java_websocket.handshake.ServerHandshake
-import org.json.JSONObject
-import org.webrtc.IceCandidate
-import org.webrtc.SessionDescription
 
 /**
  * Created By Malibin

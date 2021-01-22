@@ -90,12 +90,11 @@ class WebRtcClient(
     }
 
     fun close() {
-        peerConnectionFactory.dispose()
+        webSocketRtcClient.close()
+        peerConnectionClient.close()
+        mediaTrackManager.dispose()
         PeerConnectionFactory.stopInternalTracingCapture()
         PeerConnectionFactory.shutdownInternalTracer()
-        peerConnectionClient.close()
-        webSocketRtcClient.close()
-        mediaTrackManager.dispose()
     }
 
     companion object {
@@ -136,7 +135,7 @@ class WebRtcClient(
 
         override fun onClose(code: Int, reason: String?, remote: Boolean) {
             printLog("Socket onClose // code : $code reason : $reason, remote : $remote")
-            close()
+            if (remote) close()
         }
 
         override fun onError(exception: Exception?) {

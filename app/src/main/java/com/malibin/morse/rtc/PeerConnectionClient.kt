@@ -10,7 +10,6 @@ import org.webrtc.PeerConnection
 import org.webrtc.RtpSender
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
-import org.webrtc.VideoSink
 import org.webrtc.VideoTrack
 
 /**
@@ -23,9 +22,8 @@ class PeerConnectionClient(
 ) {
     private var createOfferCallback: CreateOfferCallback? = null
 
-    private val dataChannel: DataChannel by lazy {
+    private val dataChannel: DataChannel =
         peerConnection.createDataChannel("dataChannelLabel", DataChannel.Init())
-    }
 
     // 이노메 옵저버 위치 다시 생각해봐야함
     private val sdpObserver = SessionDescriptionProtocolObserver()
@@ -51,18 +49,6 @@ class PeerConnectionClient(
     private fun findVideoSender(): RtpSender? {
         return peerConnection.senders.find { it.track()?.kind() == "video" }
     }
-
-//    fun addRemoteVideoSink(videoRenderer: VideoSink) {
-//        val remoteVideoTrack = getRemoteVideoTrack()
-//        remoteVideoTrack.addSink(videoRenderer)
-//    }
-//
-//    private fun getRemoteVideoTrack(): VideoTrack {
-//        return peerConnection.transceivers
-//            .map { it.receiver.track() }
-//            .find { it is VideoTrack } as? VideoTrack
-//            ?: error("cannot find remote videoTrack")
-//    }
 
     fun createOffer(callback: CreateOfferCallback) {
         this.createOfferCallback = callback
@@ -94,7 +80,10 @@ class PeerConnectionClient(
     }
 
     fun close() {
-        dataChannel.dispose()
+        try{
+            dataChannel.dispose()
+        }catch (e:Exception){
+        }
         peerConnection.dispose()
     }
 

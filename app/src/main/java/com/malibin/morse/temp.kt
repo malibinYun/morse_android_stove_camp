@@ -9,3 +9,9 @@ val localSdp =
 fun SessionDescription.string(): String {
     return "SessionDescription(type : ${this.type}, description : ${this.description})"
 }
+
+class Test{
+    companion object{
+        const val word = "sdf"
+    }
+}

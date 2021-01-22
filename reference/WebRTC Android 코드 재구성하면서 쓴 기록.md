@@ -212,6 +212,42 @@ videoCapturer를 만들어야해서 (아니 근데 왜 이름이 captor가 아�
 
 
 
+## 방송하는 사람이 생명주기에 맞춰서 꺼지는 경우
+
+뷰어 모드에서 방종했다는 Socket 메시지 처리를 안한 상황임.
+
+* Socket Response가 날라옴 (방종했다는)
+
+* 이후에 내부적으로 connection.cc 에서 겁나 요청을 계속보냄. 아래를 미친듯이 많이 보냄.
+
+  * >2021-01-22 15:47:58.080 19822-20443/com.malibin.morse I/connection.cc: (line 1168): Conn[a326e400:0:Net[wlan0:10.99.0.x/19:Wifi:id=5]:xtmGkX3O:1:0:relay:udp:117.17.196.x:50440->15EOSoqO:1:505413887:relay:udp:117.17.196.x:51893|C-xI|-|0|0|179896591694430718|-]: Sent STUN BINDING request, id=316c74396c4c74625430354d, use_candidate=0, nomination=0
+    >2021-01-22 15:47:58.182 19822-20443/com.malibin.morse I/connection.cc: (line 1168): Conn[a326e400:0:Net[wlan0:10.99.0.x/19:Wifi:id=5]:xtmGkX3O:1:0:relay:udp:117.17.196.x:50440->15EOSoqO:1:505413887:relay:udp:117.17.196.x:51893|C-xI|-|0|0|179896591694430718|-]: Sent STUN BINDING request, id=2b337857564b4d3261676644, use_candidate=0, nomination=0
+    >2021-01-22 15:47:58.283 19822-20443/com.malibin.morse I/connection.cc: (line 1168): Conn[a326e400:0:Net[wlan0:10.99.0.x/19:Wifi:id=5]:xtmGkX3O:1:0:relay:udp:117.17.196.x:50440->15EOSoqO:1:505413887:relay:udp:117.17.196.x:51893|C-xI|-|0|0|179896591694430718|-]: Sent STUN BINDING request, id=546f634e7055386561474136, use_candidate=0, nomination=0
+    >2021-01-22 15:47:58.384 19822-20443/com.malibin.morse I/connection.cc: (line 1168): 
+    >
+    >...
+
+* onIceConnectionChange // ICE newState : DISCONNECTED 호출
+
+* onIceConnectionChange // ICE newState : FAILED
+
+  * 이게 호출되면서 더이상 connection.cc 호출되지 않음. ping을 133번 보냈나봄.
+
+  * >I/peer_connection.cc: (line 4693): Changing standardized IceConnectionState 5 => 4
+    >2021-01-22 15:48:09.763 19822-20443/com.malibin.morse I/connection.cc: (line 1217): Connection deleted with number of pings sent: 133
+
+
+
+## 방송하는 사람의 네트워크가 비정상적으로 끊어지는경우
+
+뷰어 모드에서 걍 아무것도 안날라옴 걍 멈춤
+
+콜백 아무고토 안날라옴..
+
+
+
+
+
 ## 기타등등
 
 ``` 

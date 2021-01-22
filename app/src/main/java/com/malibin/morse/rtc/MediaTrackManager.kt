@@ -1,10 +1,12 @@
 package com.malibin.morse.rtc
 
 import android.content.Context
+import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
 import org.webrtc.Camera2Enumerator
 import org.webrtc.EglBase
 import org.webrtc.MediaConstraints
+import org.webrtc.MediaSource
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoCapturer
@@ -22,12 +24,24 @@ class MediaTrackManager(
     context: Context,
     factory: PeerConnectionFactory,
 ) {
-    val audioTrack: AudioTrack by lazy { createAudioTrack(factory) }
-    val videoTrack: VideoTrack by lazy { createVideoTrack(factory, eglBase, context) }
+    val audioTrack: AudioTrack by lazy { createAudioTrack(factory, audioSource) }
+    private val audioSource: AudioSource by lazy { createAudioSource(factory) }
 
-    private fun createAudioTrack(factory: PeerConnectionFactory): AudioTrack {
-        val audioSource = factory.createAudioSource(createAudioConstraints(false))
-        return factory.createAudioTrack(AUDIO_TRACK_ID, audioSource) //AUDIO_TRACK_ID
+    val videoTrack: VideoTrack by lazy { createVideoTrack(factory, videoSource) }
+    private val videoCapturer: VideoCapturer by lazy { createVideoCapturer(context) }
+    private val videoSource: VideoSource by lazy {
+        createVideoSource(factory, eglBase, context, videoCapturer)
+    }
+
+    private fun createAudioSource(factory: PeerConnectionFactory): AudioSource {
+        return factory.createAudioSource(createAudioConstraints(false))
+    }
+
+    private fun createAudioTrack(
+        factory: PeerConnectionFactory,
+        audioSource: AudioSource
+    ): AudioTrack {
+        return factory.createAudioTrack(AUDIO_TRACK_ID, audioSource)
             .apply { setEnabled(true) }
     }
 
@@ -45,10 +59,8 @@ class MediaTrackManager(
 
     private fun createVideoTrack(
         factory: PeerConnectionFactory,
-        eglBase: EglBase,
-        context: Context,
+        videoSource: VideoSource,
     ): VideoTrack {
-        val videoSource = createVideoSource(factory, eglBase, context)
         val videoTrack = factory.createVideoTrack(VIDEO_TRACK_ID, videoSource)
         videoTrack.setEnabled(true)
         return videoTrack
@@ -58,17 +70,17 @@ class MediaTrackManager(
         factory: PeerConnectionFactory,
         eglBase: EglBase,
         context: Context,
+        videoCapturer: VideoCapturer,
     ): VideoSource {
         val surfaceTextureHelper =
             SurfaceTextureHelper.create("CaptureThread", eglBase.eglBaseContext)
-        val videoCapturer = createVideoCapturer(context)
         val videoSource = factory.createVideoSource(videoCapturer.isScreencast)
         videoCapturer.initialize(surfaceTextureHelper, context, videoSource.capturerObserver)
         videoCapturer.startCapture(1280, 720, 30) // video width, height, fps
         return videoSource
     }
 
-    private fun createVideoCapturer(context:Context): VideoCapturer {
+    private fun createVideoCapturer(context: Context): VideoCapturer {
         val cameraEnumerator = Camera2Enumerator(context)
         val deviceName = cameraEnumerator.deviceNames.find { cameraEnumerator.isFrontFacing(it) }
             ?: cameraEnumerator.deviceNames.find { cameraEnumerator.isBackFacing(it) }
@@ -86,7 +98,12 @@ class MediaTrackManager(
 
     fun dispose() {
         audioTrack.dispose()
+        audioSource.dispose()
+
         videoTrack.dispose()
+        videoCapturer.stopCapture()
+        videoCapturer.dispose()
+        videoSource.dispose()
     }
 
     companion object {

@@ -90,7 +90,9 @@ public class Temp {
     }
 
 
-
+    public void test() {
+//        Test.word;
+    }
 
 
     public static String setStartBitrate(
