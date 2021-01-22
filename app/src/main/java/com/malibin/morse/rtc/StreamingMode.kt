@@ -1,4 +1,4 @@
-package com.malibin.morse.data
+package com.malibin.morse.rtc
 
 /**
  * Created By Malibin

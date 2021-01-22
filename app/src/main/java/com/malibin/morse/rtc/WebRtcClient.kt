@@ -2,7 +2,6 @@ package com.malibin.morse.rtc
 
 import android.content.Context
 import com.malibin.morse.R
-import com.malibin.morse.data.StreamingMode
 import com.malibin.morse.data.entity.ID
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
@@ -10,6 +9,7 @@ import org.java_websocket.handshake.ServerHandshake
 import org.webrtc.DataChannel
 import org.webrtc.EglBase
 import org.webrtc.IceCandidate
+import org.webrtc.Logging
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
@@ -29,6 +29,7 @@ interface WebRtcClientEvents {
 class WebRtcClient(
     val context: Context,
     eglBase: EglBase,
+    private val streamingMode: StreamingMode,
     private val webRtcClientEvents: WebRtcClientEvents,
 ) {
     private val peerConnectionFactory: PeerConnectionFactory by lazy {
@@ -43,6 +44,8 @@ class WebRtcClient(
     private val mediaTrackManager: MediaTrackManager by lazy {
         MediaTrackManager(eglBase, context, peerConnectionFactory)
     }
+
+    private var remoteRenderer: VideoSink? = null
 
     private fun createPeerConnection(): PeerConnection {
         return peerConnectionFactory.createPeerConnection(
@@ -63,11 +66,17 @@ class WebRtcClient(
         }
     }
 
-    fun connectPeer(videoRenderer: VideoSink, mode: StreamingMode) {
-        if(mode == StreamingMode.BROADCAST){
-            peerConnectionClient.addTracks(mediaTrackManager.audioTrack, mediaTrackManager.videoTrack)
+    fun connectPeer(videoRenderer: VideoSink) {
+        if (streamingMode == StreamingMode.BROADCAST) {
+            peerConnectionClient.addTracks(
+                mediaTrackManager.audioTrack,
+                mediaTrackManager.videoTrack
+            )
+            mediaTrackManager.attachLocalVideoRenderer(videoRenderer)
+        } else {
+            remoteRenderer = videoRenderer
+//            peerConnectionClient.addRemoteVideoSink(videoRenderer)
         }
-        mediaTrackManager.attachLocalVideoRenderer(videoRenderer)
         webSocketRtcClient.setTrustedCertificate(context.resources.openRawResource(R.raw.kurento_example_certification))
         webSocketRtcClient.connectRoom()
     }
@@ -82,6 +91,8 @@ class WebRtcClient(
 
     fun close() {
         peerConnectionFactory.dispose()
+        PeerConnectionFactory.stopInternalTracingCapture()
+        PeerConnectionFactory.shutdownInternalTracer()
         peerConnectionClient.close()
         webSocketRtcClient.close()
         mediaTrackManager.dispose()
@@ -106,16 +117,20 @@ class WebRtcClient(
             printLog("onMessage Called // response : $response")
             if (response == null) return
 
-            if (response.responseId == ID.PRESENTER_RESPONSE) {
-                printLog("onMessage PRESENTER_RESPONSE called")
-                val sdp = SessionDescription(SessionDescription.Type.ANSWER, response.sdpAnswer)
-                peerConnectionClient.setRemoteDescription(sdp)
-            }
-
-            if (response.responseId == ID.ICE_CANDIDATE) {
-                printLog("onMessage ICE_CANDIDATE called")
-                val candidateResponse = response.candidate ?: error("candidate cannot be null")
-                peerConnectionClient.addRemoteIceCandidate(candidateResponse.toIceCandidate())
+            when (response.responseId) {
+                ID.PRESENTER_RESPONSE, ID.VIEWER_RESPONSE -> {
+                    printLog("onMessage ${response.responseId} called")
+                    val sdp = SessionDescription(SessionDescription.Type.ANSWER, response.sdpAnswer)
+                    peerConnectionClient.setRemoteDescription(sdp)
+                }
+                ID.ICE_CANDIDATE -> {
+                    printLog("onMessage ICE_CANDIDATE called")
+                    val candidateResponse = response.candidate ?: error("candidate cannot be null")
+                    peerConnectionClient.addRemoteIceCandidate(candidateResponse.toIceCandidate())
+                }
+                ID.STOP_COMMUNICATION -> {
+                    // 멈추기
+                }
             }
         }
 
@@ -133,7 +148,7 @@ class WebRtcClient(
 
     private inner class CreateOfferCallbackImpl : CreateOfferCallback {
         override fun onOfferSetSuccess(sessionDescription: SessionDescription) {
-            webSocketRtcClient.sendOfferSessionDescription(sessionDescription)
+            webSocketRtcClient.sendOfferSessionDescription(sessionDescription, streamingMode)
         }
     }
 
@@ -174,6 +189,12 @@ class WebRtcClient(
 
         override fun onAddStream(mediaStream: MediaStream?) {
             printLog("onAddStream // $mediaStream")
+            remoteRenderer ?: return
+            printLog("remoteRenderer adding...")
+            val remoteTrack = mediaStream?.videoTracks?.get(0) ?: error("없음")
+            remoteTrack.setEnabled(true)
+            remoteTrack.addSink(remoteRenderer)
+            Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
         }
         // 중국인 앱 봐야함
 

@@ -1,16 +1,12 @@
 package com.malibin.morse.rtc
 
 import com.malibin.morse.presentation.utils.printLog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnection
-import org.webrtc.PeerConnectionFactory
 import org.webrtc.RtpSender
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
@@ -56,9 +52,20 @@ class PeerConnectionClient(
         return peerConnection.senders.find { it.track()?.kind() == "video" }
     }
 
+//    fun addRemoteVideoSink(videoRenderer: VideoSink) {
+//        val remoteVideoTrack = getRemoteVideoTrack()
+//        remoteVideoTrack.addSink(videoRenderer)
+//    }
+//
+//    private fun getRemoteVideoTrack(): VideoTrack {
+//        return peerConnection.transceivers
+//            .map { it.receiver.track() }
+//            .find { it is VideoTrack } as? VideoTrack
+//            ?: error("cannot find remote videoTrack")
+//    }
+
     fun createOffer(callback: CreateOfferCallback) {
         this.createOfferCallback = callback
-//        val sdpObserver = SessionDescriptionProtocolObserver()
         val sdpMediaConstraints = createSdpConstraints()
         peerConnection.createOffer(sdpObserver, sdpMediaConstraints)
     }
@@ -82,27 +89,16 @@ class PeerConnectionClient(
     }
 
     fun addRemoteIceCandidate(iceCandidate: IceCandidate) {
-        CoroutineScope(Dispatchers.IO).launch {
-            printLog("addRemoteIceCandidate called")
-            peerConnection.addIceCandidate(iceCandidate)
-        }
+        printLog("addRemoteIceCandidate called")
+        peerConnection.addIceCandidate(iceCandidate)
     }
 
-    fun close() = CoroutineScope(Dispatchers.IO).launch {
+    fun close() {
         dataChannel.dispose()
         peerConnection.dispose()
-        PeerConnectionFactory.stopInternalTracingCapture()
-        PeerConnectionFactory.shutdownInternalTracer()
     }
 
     companion object {
-        private val MORSE_TURN_SERVER = PeerConnection.IceServer
-            .builder("turn:117.17.196.61:3478")
-            .setUsername("testuser")
-            .setPassword("root")
-            .createIceServer()
-        private val ICE_SERVERS = listOf(MORSE_TURN_SERVER)
-
         @JvmStatic
         private fun preferCodec(
             sessionDescription: String,
@@ -159,7 +155,6 @@ class PeerConnectionClient(
             val localDescription = SessionDescription(sessionDescription.type, description)
             this.localDescription = localDescription
             printLog("onCreateSuccess // set local description")
-            // 비동기 동작
             peerConnection.setLocalDescription(this, localDescription)
         }
 

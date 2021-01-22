@@ -10,7 +10,8 @@ enum class ID(
 ) {
     PRESENTER_RESPONSE("presenterResponse"),
     VIEWER_RESPONSE("viewerResponse"),
-    ICE_CANDIDATE("iceCandidate");
+    ICE_CANDIDATE("iceCandidate"),
+    STOP_COMMUNICATION("stopCommunication");
 
     fun has(value: String): Boolean = this.value == value
 

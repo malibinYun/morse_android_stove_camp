@@ -39,12 +39,12 @@ class ViewerActivity : AppCompatActivity() {
     }
 
     private fun startWatchBroadcast(renderer: VideoSink) {
-//        viewerViewModel.connectPeer(rootEgl, renderer)
+        viewerViewModel.connect(rootEgl, renderer)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-//        viewerViewModel.disconnect()
+        viewerViewModel.disconnect()
         binding?.windowViewerSurface?.release()
         binding = null
         rootEgl.release()

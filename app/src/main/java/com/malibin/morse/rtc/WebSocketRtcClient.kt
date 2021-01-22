@@ -52,7 +52,7 @@ class WebSocketRtcClient(
     }
 
     override fun onMessage(message: String?) {
-        val response = gson.fromJson(message,SocketResponse::class.java)
+        val response = gson.fromJson(message, SocketResponse::class.java)
         callback.onMessage(response)
     }
 
@@ -68,14 +68,16 @@ class WebSocketRtcClient(
         connect()
     }
 
-    override fun sendOfferSessionDescription(sessionDescription: SessionDescription) {
+    override fun sendOfferSessionDescription(
+        sessionDescription: SessionDescription,
+        streamingMode: StreamingMode
+    ) {
         val json = JSONObject().apply {
-            put("id", "presenter")
+            put("id", streamingMode.id)
             put("sdpOffer", sessionDescription.description)
         }
         send(json.toString())
     }
-    // presenter 이런건 Room Parameter같은걸로 받아서 enum으로 처리하자
 
     override fun sendAnswerSessionDescription(sessionDescription: SessionDescription) {
         printLog("sendAnswerSessionDescription : $sessionDescription")

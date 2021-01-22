@@ -12,7 +12,10 @@ interface RtcClient {
 
     fun connectRoom()
 
-    fun sendOfferSessionDescription(sessionDescription: SessionDescription)
+    fun sendOfferSessionDescription(
+        sessionDescription: SessionDescription,
+        streamingMode: StreamingMode
+    )
 
     fun sendAnswerSessionDescription(sessionDescription: SessionDescription)
 
