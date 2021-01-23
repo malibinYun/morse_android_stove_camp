@@ -3,15 +3,22 @@ package com.malibin.morse.presentation.signup
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.malibin.morse.R
+import com.malibin.morse.data.repository.AuthRepository
 import com.malibin.morse.presentation.utils.SingleLiveEvent
+import com.malibin.morse.presentation.utils.printLog
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 
 /**
  * Created By Malibin
  * on 1월 11, 2021
  */
 
-class SignUpViewModel @ViewModelInject constructor() : ViewModel() {
+class SignUpViewModel @ViewModelInject constructor(
+    private val authRepository: AuthRepository,
+) : ViewModel() {
 
     val pagerPosition = MutableLiveData(0)
     val email = MutableLiveData("")
@@ -21,6 +28,20 @@ class SignUpViewModel @ViewModelInject constructor() : ViewModel() {
     val passwordCheck = MutableLiveData("")
 
     val toastMessage = SingleLiveEvent<Int>()
+
+    fun checkEmail() = viewModelScope.launch(handleCheckEmailFail()) {
+        val inputEmail = email.value ?: error("email cannot be null")
+        if (inputEmail.isBlank()) {
+            toastMessage.value = R.string.input_email
+            return@launch
+        }
+        authRepository.checkEmail(inputEmail)
+    }
+
+    private fun handleCheckEmailFail() = CoroutineExceptionHandler { _, t ->
+        printLog("")
+        t.printStackTrace()
+    }
 
     fun goSignUpNextStep() = when {
         email.value.isNullOrBlank() -> toastMessage.value = R.string.input_email
