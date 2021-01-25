@@ -5,7 +5,7 @@ package com.malibin.morse.data.service.response
  * on 1월 25, 2021
  */
 
-class ErrorResponse(
+data class ErrorResponse(
     val timestamp: String,
     val status: Int,
     val message: String,

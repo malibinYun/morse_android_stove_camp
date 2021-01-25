@@ -1,14 +1,16 @@
 package com.malibin.morse.presentation.signup
 
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malibin.morse.R
 import com.malibin.morse.data.repository.AuthRepository
+import com.malibin.morse.data.service.HttpExceptionHandler
 import com.malibin.morse.presentation.utils.SingleLiveEvent
 import com.malibin.morse.presentation.utils.printLog
-import kotlinx.coroutines.CoroutineExceptionHandler
+import com.malibin.morse.presentation.utils.showToast
 import kotlinx.coroutines.launch
 
 /**
@@ -28,24 +30,23 @@ class SignUpViewModel @ViewModelInject constructor(
     val passwordCheck = MutableLiveData("")
 
     val toastMessage = SingleLiveEvent<Int>()
+    val errorMessage = SingleLiveEvent<String>()
 
-    fun checkEmail() = viewModelScope.launch(handleCheckEmailFail()) {
-        val inputEmail = email.value ?: error("email cannot be null")
-        if (inputEmail.isBlank()) {
-            toastMessage.value = R.string.input_email
-            return@launch
-        }
-        authRepository.checkEmail(inputEmail)
-    }
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
 
-    private fun handleCheckEmailFail() = CoroutineExceptionHandler { _, t ->
-        printLog("")
-        t.printStackTrace()
-    }
+    private val _isVerified = MutableLiveData<Boolean>()
+    val isVerified: LiveData<Boolean> = _isVerified
+
+    private fun getEmail() = email.value ?: error("email cannot be null")
+    private fun getVerifyNumber() = verifyNumber.value ?: error("verifyNumber cannot be null")
+    private fun getNickname() = nickname.value ?: error("nickname cannot be null")
+    private fun getPassword() = password.value ?: error("password cannot be null")
+    private fun getPasswordCheck() = passwordCheck.value ?: error("passwordCheck cannot be null")
 
     fun goSignUpNextStep() = when {
-        email.value.isNullOrBlank() -> toastMessage.value = R.string.input_email
-        verifyNumber.value.isNullOrBlank() -> toastMessage.value = R.string.input_verify_number
+        getEmail().isBlank() -> toastMessage.value = R.string.input_email
+        getVerifyNumber().isBlank() -> toastMessage.value = R.string.input_verify_number
         else -> goNextPage()
     }
 
@@ -62,15 +63,48 @@ class SignUpViewModel @ViewModelInject constructor(
     fun getCurrentPagerPosition(): Int = pagerPosition.value
         ?: error("pagerPosition cannot be null")
 
+    fun checkEmail() = viewModelScope.launch(handleHttpError()) {
+        _isLoading.value = true
+        val inputEmail = getEmail()
+        if (inputEmail.isBlank()) {
+            toastMessage.value = R.string.input_email
+            _isLoading.value = false
+            return@launch
+        }
+        authRepository.checkEmail(inputEmail)
+        toastMessage.value = R.string.send_email_verify_code
+        _isLoading.value = false
+    }
+
+    fun verifyEmail() = viewModelScope.launch(handleHttpError()) {
+        _isLoading.value = true
+        val inputVerifyNumber = getVerifyNumber()
+        if (inputVerifyNumber.isBlank()) {
+            toastMessage.value = R.string.input_verify_number
+            _isLoading.value = false
+            return@launch
+        }
+        authRepository.verifyEmail(getEmail(), inputVerifyNumber)
+        toastMessage.value = R.string.verify_complete
+        _isVerified.value = true
+        _isLoading.value = false
+    }
+
     fun submitSignUp() = when {
-        email.value.isNullOrBlank() -> toastMessage.value = R.string.input_email
-        verifyNumber.value.isNullOrBlank() -> toastMessage.value = R.string.input_verify_number
-        nickname.value.isNullOrBlank() -> toastMessage.value = R.string.input_nickname
-        password.value.isNullOrBlank() -> toastMessage.value = R.string.input_password
+        getEmail().isBlank() -> toastMessage.value = R.string.input_email
+        getVerifyNumber().isBlank() -> toastMessage.value = R.string.input_verify_number
+        getNickname().isBlank() -> toastMessage.value = R.string.input_nickname
+        getPassword().isBlank() -> toastMessage.value = R.string.input_password
         isPasswordsNotEqual() -> toastMessage.value = R.string.passwords_not_equal
         else -> {
             // TODO 실제 회원가입 로직
         }
+    }
+
+    private fun handleHttpError() = HttpExceptionHandler {
+        printLog(it)
+        errorMessage.value = it.message
+        _isLoading.value = false
     }
 
     private fun isPasswordsNotEqual(): Boolean {

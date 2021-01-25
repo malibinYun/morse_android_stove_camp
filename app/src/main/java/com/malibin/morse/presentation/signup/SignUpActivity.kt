@@ -33,7 +33,8 @@ class SignUpActivity : AppCompatActivity() {
         signUpViewModel.pagerPosition.observe(this) {
             binding.pagerSignup.currentItem = it ?: return@observe
         }
-        signUpViewModel.toastMessage.observe(this) { showToast(it ?: return@observe) }
+        signUpViewModel.toastMessage.observe(this) { showToast(it) }
+        signUpViewModel.errorMessage.observe(this) { showToast(it) }
     }
 
     override fun onBackPressed() {

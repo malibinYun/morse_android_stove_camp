@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.malibin.morse.R
 import com.malibin.morse.databinding.FragmentEmailVerifyBinding
+import com.malibin.morse.presentation.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -32,5 +34,13 @@ class EmailVerifyFragment : Fragment() {
     private fun initView(binding: FragmentEmailVerifyBinding) {
         binding.lifecycleOwner = activity
         binding.viewModel = signUpViewModel
+        binding.buttonSendVerifyCode.setOnClickListener { onVerifyButtonClick(it, binding) }
+    }
+
+    private fun onVerifyButtonClick(view: View, binding: FragmentEmailVerifyBinding) {
+        view.isEnabled = false
+        binding.textEmail.isEnabled = false
+        binding.buttonVerify.visibility = View.VISIBLE
+        signUpViewModel.checkEmail()
     }
 }

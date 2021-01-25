@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.malibin.morse.databinding.ActivityLoginBinding
 import com.malibin.morse.presentation.signup.SignUpActivity
+import com.malibin.morse.presentation.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,7 +27,10 @@ class LoginActivity : AppCompatActivity() {
             Toast.makeText(this, "로그인굳드", Toast.LENGTH_SHORT).show()
         }
         loginViewModel.toastMessage.observe(this) {
-            showToast(it)
+            when (it) {
+                is Int -> showToast(it)
+                is String -> showToast(it)
+            }
         }
     }
 
@@ -39,12 +43,5 @@ class LoginActivity : AppCompatActivity() {
     private fun deploySignUpActivity() {
         val intent = Intent(this, SignUpActivity::class.java)
         startActivity(intent)
-    }
-
-    private fun showToast(message: Any?) {
-        when (message) {
-            is Int -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            is String -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
     }
 }
