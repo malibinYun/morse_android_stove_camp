@@ -3,7 +3,14 @@ package com.malibin.morse.rtc
 import com.google.gson.Gson
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.java_websocket.WebSocket
 import org.java_websocket.client.WebSocketClient
+import org.java_websocket.framing.Framedata
 import org.java_websocket.handshake.ServerHandshake
 import org.json.JSONObject
 import org.webrtc.IceCandidate
@@ -49,6 +56,17 @@ class WebSocketRtcClient(
 
     override fun onOpen(handshakedata: ServerHandshake?) {
         callback.onOpen(handshakedata)
+
+//        CoroutineScope(Dispatchers.IO).launch {
+//            var count = 0
+//            while (count < 20) {
+//                sendPing()
+//                printLog("ping send")
+//                count++
+//                delay(1_000)
+//            }
+//            this.cancel()
+//        }
     }
 
     override fun onMessage(message: String?) {
@@ -93,6 +111,19 @@ class WebSocketRtcClient(
 
     override fun sendLocalIceCandidateRemovals(iceCandidates: Array<IceCandidate?>) {
         printLog("sendLocalIceCandidateRemovals : ${iceCandidates.toList()}")
+    }
+
+    override fun onWebsocketPong(conn: WebSocket?, f: Framedata?) {
+        super.onWebsocketPong(conn, f)
+        printLog("onWebsocket Pong ${f?.opcode}\n ")
+        printLog("onWebSocket Pong ${String(f?.payloadData?.array() ?: ByteArray(0))}")
+    }
+
+    override fun onWebsocketPing(conn: WebSocket?, f: Framedata?) {
+        super.onWebsocketPing(conn, f)
+        printLog("onWebsocket Ping ${f?.opcode}")
+        printLog("onWebsocket Ping ${String(f?.payloadData?.array() ?: ByteArray(0))}")
+
     }
 
     companion object {

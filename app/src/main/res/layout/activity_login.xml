@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -8,9 +10,7 @@
             type="com.malibin.morse.presentation.login.LoginViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".presentation.login.LoginActivity">
@@ -32,7 +32,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
             android:ems="10"
-            android:inputType="textPersonName|textEmailAddress"
+            android:inputType="textWebEmailAddress|textPersonName|textEmailAddress"
             android:text="@={viewModel.email}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -25,6 +25,9 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.isSuccess.observe(this) {
             Toast.makeText(this, "로그인굳드", Toast.LENGTH_SHORT).show()
         }
+        loginViewModel.toastMessage.observe(this) {
+            showToast(it)
+        }
     }
 
     private fun initView(binding: ActivityLoginBinding) {
@@ -36,5 +39,12 @@ class LoginActivity : AppCompatActivity() {
     private fun deploySignUpActivity() {
         val intent = Intent(this, SignUpActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun showToast(message: Any?) {
+        when (message) {
+            is Int -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            is String -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
     }
 }

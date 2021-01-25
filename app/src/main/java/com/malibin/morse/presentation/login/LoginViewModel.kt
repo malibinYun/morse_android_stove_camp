@@ -6,9 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malibin.morse.R
 import com.malibin.morse.data.repository.AuthRepository
+import com.malibin.morse.data.service.HttpExceptionHandler
+import com.malibin.morse.data.service.response.ErrorResponse
 import com.malibin.morse.presentation.utils.SingleLiveEvent
+import com.malibin.morse.presentation.utils.printLog
+import com.orhanobut.logger.Logger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.HttpException
+import retrofit2.Retrofit
+import java.net.UnknownHostException
 
 /**
  * Created By Malibin
@@ -23,7 +31,7 @@ class LoginViewModel @ViewModelInject constructor(
 
     val isLoading = SingleLiveEvent<Boolean>()
     val isSuccess = SingleLiveEvent<Any>()
-    val toastMessage = SingleLiveEvent<Int>()
+    val toastMessage = SingleLiveEvent<Any>()
 
     fun login() {
         isLoading.value = true
@@ -41,7 +49,9 @@ class LoginViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun handleLoginFail() = CoroutineExceptionHandler { _, t ->
+    private fun handleLoginFail() = HttpExceptionHandler {
         isLoading.value = false
+        toastMessage.value = it.message
+        printLog(it)
     }
 }
