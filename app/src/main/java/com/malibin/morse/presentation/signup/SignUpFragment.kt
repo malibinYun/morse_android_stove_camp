@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.malibin.morse.databinding.FragmentEmailVerifyBinding
 import com.malibin.morse.databinding.FragmentSignupBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,6 +33,12 @@ class SignUpFragment : Fragment() {
     private fun initView(binding: FragmentSignupBinding) {
         binding.lifecycleOwner = activity
         binding.viewModel = signUpViewModel
+        binding.buttonNicknameCheck.setOnClickListener { onVerifyButtonClick(it, binding) }
     }
 
+    private fun onVerifyButtonClick(view: View, binding: FragmentSignupBinding) {
+        view.isEnabled = false
+        binding.textNickname.isEnabled = false
+        signUpViewModel.checkNickname()
+    }
 }

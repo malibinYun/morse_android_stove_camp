@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -8,9 +9,7 @@
             type="com.malibin.morse.presentation.signup.SignUpViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -56,9 +55,11 @@
 
         <EditText
             android:id="@+id/text_password"
-            android:layout_width="347dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ems="10"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:hint="숫자, 알파벳, 특수문자 포함 8자 이상"
             android:inputType="textPersonName|textPassword"
             android:text="@={viewModel.password}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -80,7 +81,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
-            android:ems="10"
             android:inputType="textPersonName|textPassword"
             android:text="@={viewModel.passwordCheck}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -88,8 +88,8 @@
             app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
         <TextView
-            style="@style/TextButton"
             android:id="@+id/button_signup"
+            style="@style/TextButton"
             android:layout_width="251dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
@@ -98,8 +98,11 @@
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:text="회원가입"
+            app:isEnabled="@{viewModel.isNicknameChecked() &amp;&amp; (viewModel.password.equals(viewModel.passwordCheck)) &amp;&amp; !viewModel.password.empty &amp;&amp; !viewModel.passwordCheck.empty}"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_password_check" />
+            app:layout_constraintTop_toBottomOf="@+id/text_password_check"
+            app:layout_constraintVertical_bias="0.0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

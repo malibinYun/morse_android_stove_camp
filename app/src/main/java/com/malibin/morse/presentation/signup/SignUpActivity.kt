@@ -27,14 +27,16 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun initView(binding: ActivitySignUpBinding) {
+        binding.viewModel = signUpViewModel
+        binding.lifecycleOwner = this
         binding.pagerSignup.adapter = SignUpPagerAdapter(this)
         binding.pagerSignup.isUserInputEnabled = false
-
         signUpViewModel.pagerPosition.observe(this) {
             binding.pagerSignup.currentItem = it ?: return@observe
         }
         signUpViewModel.toastMessage.observe(this) { showToast(it) }
         signUpViewModel.errorMessage.observe(this) { showToast(it) }
+        signUpViewModel.isSignUpSuccess.observe(this) { finish() }
     }
 
     override fun onBackPressed() {

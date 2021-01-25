@@ -1,4 +1,4 @@
-package com.malibin.morse.data.service
+package com.malibin.morse.presentation.utils
 
 import com.malibin.morse.data.service.response.ErrorResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
