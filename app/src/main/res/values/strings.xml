@@ -10,4 +10,6 @@
     <string name="passwords_not_equal">비밀번호가 서로 다릅니다.</string>
     <string name="permission_rejected">권한을 거부하시면 서비스를 이용하실 수 없어요 ㅠㅠ</string>
     <string name="cannot_broadcast_no_camera">카메라가 없는 기기에서는 방송을 할 수 없습니다.</string>
+    <string name="send_email_verify_code">인증번호를 이메일로 보냈습니다.</string>
+    <string name="verify_complete">인증완료</string>
 </resources>

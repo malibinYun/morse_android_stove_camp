@@ -88,6 +88,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
         <TextView
+            style="@style/TextButton"
             android:id="@+id/button_signup"
             android:layout_width="251dp"
             android:layout_height="wrap_content"

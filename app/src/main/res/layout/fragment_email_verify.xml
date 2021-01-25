@@ -38,10 +38,10 @@
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
         <TextView
-            android:id="@+id/button_verify"
+            android:id="@+id/button_send_verify_code"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="인증하기"
+            android:text="인증번호 받기"
             app:layout_constraintEnd_toEndOf="@+id/text_email"
             app:layout_constraintTop_toBottomOf="@+id/text_email" />
 
@@ -63,12 +63,14 @@
             android:ems="10"
             android:inputType="number"
             android:text="@={viewModel.verifyNumber}"
+            app:isEnabled="@{!viewModel.isVerified()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
         <TextView
             android:id="@+id/button_next"
+            style="@style/TextButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="80dp"
@@ -79,9 +81,34 @@
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:text="다음"
+            app:isEnabled="@{viewModel.isVerified()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_verify_number" />
+
+        <TextView
+            android:id="@+id/button_verify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{(view) -> viewModel.verifyEmail()}"
+            android:text="인증하기"
+            android:visibility="gone"
+            app:isEnabled="@{!viewModel.isVerified()}"
+            app:layout_constraintEnd_toEndOf="@+id/text_verify_number"
+            app:layout_constraintTop_toBottomOf="@+id/text_verify_number"
+            tools:visibility="visible" />
+
+        <include
+            android:id="@+id/window_loading"
+            layout="@layout/window_loading"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:isLoading="@{viewModel.isLoading()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
