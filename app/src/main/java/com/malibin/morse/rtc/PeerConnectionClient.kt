@@ -6,10 +6,12 @@ import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
+import org.webrtc.MediaStreamTrack
 import org.webrtc.PeerConnection
 import org.webrtc.RtpSender
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
+import org.webrtc.VideoSink
 import org.webrtc.VideoTrack
 
 /**
@@ -47,7 +49,8 @@ class PeerConnectionClient(
     }
 
     private fun findVideoSender(): RtpSender? {
-        return peerConnection.senders.find { it.track()?.kind() == "video" }
+        return peerConnection.senders
+            .find { it.track()?.kind() == MediaStreamTrack.VIDEO_TRACK_KIND }
     }
 
     fun createOffer(callback: CreateOfferCallback) {
@@ -73,16 +76,49 @@ class PeerConnectionClient(
         printLog("Remote SDP set succesfully")
         // drain 하는거 말고 하는게 없음.
     }
+//
+//    private fun setLocalDescription(sessionDescription: SessionDescription) {
+//        val description = preferCodec(sessionDescription.description, "VP8", false)
+//        val localDescription = SessionDescription(sessionDescription.type, description)
+//        printLog("onCreateSuccess // set local description")
+//        peerConnection.setLocalDescription(this, localDescription)
+//    }
 
     fun addRemoteIceCandidate(iceCandidate: IceCandidate) {
         printLog("addRemoteIceCandidate called")
         peerConnection.addIceCandidate(iceCandidate)
     }
 
+    fun attachRenderer(streamingMode: StreamingMode, renderer: VideoSink) = when (streamingMode) {
+        StreamingMode.BROADCAST -> {
+
+        }
+        StreamingMode.VIEWER -> {
+            val receiveVideoTrack = findReceiveVideoTrack()
+            receiveVideoTrack.addSink(renderer)
+        }
+    }
+
+    fun detachRenderer(streamingMode: StreamingMode, renderer: VideoSink) = when (streamingMode) {
+        StreamingMode.BROADCAST -> {
+
+        }
+        StreamingMode.VIEWER -> {
+            val receiveVideoTrack = findReceiveVideoTrack()
+            receiveVideoTrack.removeSink(renderer)
+        }
+    }
+
+    private fun findReceiveVideoTrack(): VideoTrack {
+        return peerConnection.transceivers
+            .map { it.receiver.track() }
+            .find { it is VideoTrack } as? VideoTrack ?: error("cannot find receive video track")
+    }
+
     fun close() {
-        try{
+        try {
             dataChannel.dispose()
-        }catch (e:Exception){
+        } catch (e: Exception) {
         }
         peerConnection.dispose()
     }
@@ -140,11 +176,13 @@ class PeerConnectionClient(
                 printLog("onCreateSuccess / Multiple SDP create.")
                 return
             }
+
             val description = preferCodec(sessionDescription.description, "VP8", false)
             val localDescription = SessionDescription(sessionDescription.type, description)
             this.localDescription = localDescription
             printLog("onCreateSuccess // set local description")
             peerConnection.setLocalDescription(this, localDescription)
+//            setLocalDescription(sessionDescription)
         }
 
         override fun onSetSuccess() {

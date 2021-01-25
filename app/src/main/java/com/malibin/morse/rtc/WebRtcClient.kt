@@ -9,7 +9,6 @@ import org.java_websocket.handshake.ServerHandshake
 import org.webrtc.DataChannel
 import org.webrtc.EglBase
 import org.webrtc.IceCandidate
-import org.webrtc.Logging
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
@@ -21,10 +20,6 @@ import org.webrtc.VideoSink
  * Created By Malibin
  * on 1월 21, 2021
  */
-
-interface WebRtcClientEvents {
-
-}
 
 class WebRtcClient(
     val context: Context,
@@ -81,12 +76,26 @@ class WebRtcClient(
         webSocketRtcClient.connectRoom()
     }
 
-    fun attachLocalVideoRenderer(renderer: VideoSink) {
-        mediaTrackManager.attachLocalVideoRenderer(renderer)
+    fun attachVideoRenderer(renderer: VideoSink) = when (streamingMode) {
+        StreamingMode.BROADCAST -> {
+            mediaTrackManager.attachLocalVideoRenderer(renderer)
+        }
+        StreamingMode.VIEWER -> {
+            peerConnectionClient.attachRenderer(streamingMode, renderer)
+        }
     }
 
-    fun detachLocalVideoRenderer(renderer: VideoSink) {
-        mediaTrackManager.detachLocalVideoRenderer(renderer)
+    fun detachVideoRenderer(renderer: VideoSink) = when (streamingMode) {
+        StreamingMode.BROADCAST -> {
+            mediaTrackManager.detachLocalVideoRenderer(renderer)
+        }
+        StreamingMode.VIEWER -> {
+            peerConnectionClient.detachRenderer(streamingMode, renderer)
+        }
+    }
+
+    fun getRemoteVideoTrack() {
+
     }
 
     fun close() {
@@ -188,12 +197,12 @@ class WebRtcClient(
 
         override fun onAddStream(mediaStream: MediaStream?) {
             printLog("onAddStream // $mediaStream")
-            remoteRenderer ?: return
-            printLog("remoteRenderer adding...")
-            val remoteTrack = mediaStream?.videoTracks?.get(0) ?: error("없음")
-            remoteTrack.setEnabled(true)
-            remoteTrack.addSink(remoteRenderer)
-            Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
+//            remoteRenderer ?: return
+//            printLog("remoteRenderer adding...")
+//            val remoteTrack = mediaStream?.videoTracks?.get(0) ?: error("없음")
+//            remoteTrack.setEnabled(true)
+//            remoteTrack.addSink(remoteRenderer)
+//            Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
         }
 
         override fun onRemoveStream(mediaStream: MediaStream?) {
