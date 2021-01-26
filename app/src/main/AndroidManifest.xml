@@ -16,6 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Morse"
         android:usesCleartextTraffic="true">
+        <activity android:name=".presentation.rooms.create.CreateRoomActivity"></activity>
+        <activity android:name=".presentation.rooms.RoomsActivity" />
         <activity android:name=".presentation.TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,9 +28,7 @@
         <activity android:name=".presentation.viewer.ViewerActivity" />
         <activity android:name=".presentation.broadcast.BroadCastActivity" />
         <activity android:name=".presentation.signup.SignUpActivity" />
-        <activity android:name=".presentation.login.LoginActivity">
-
-        </activity>
+        <activity android:name=".presentation.login.LoginActivity" />
     </application>
 
 </manifest>
