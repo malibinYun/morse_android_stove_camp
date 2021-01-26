@@ -113,5 +113,8 @@ class BroadCastActivity : AppCompatActivity() {
         private const val CAMERA_PERMISSION = android.Manifest.permission.CAMERA
         private const val MIC_PERMISSION = android.Manifest.permission.RECORD_AUDIO
         private const val PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED
+
+        const val KEY_ROOM_TITLE = "KEY_ROOM_TITLE"
+        const val KEY_ROOM_CONTENT = "KEY_ROOM_CONTENT"
     }
 }
