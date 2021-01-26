@@ -31,5 +31,9 @@ class BroadCastViewModel @ViewModelInject constructor(
         webRtcClient.close()
     }
 
-    private inner class WebRtcClientEventsImpl : WebRtcClientEvents
+    private inner class WebRtcClientEventsImpl : WebRtcClientEvents{
+        override fun onStateChanged(state: WebRtcClientEvents.State) {
+            println("onStateChanged $state")
+        }
+    }
 }

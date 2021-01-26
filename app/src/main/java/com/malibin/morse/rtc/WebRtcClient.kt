@@ -69,8 +69,20 @@ class WebRtcClient(
             )
             mediaTrackManager.attachLocalVideoRenderer(videoRenderer)
         } else {
-            remoteRenderer = videoRenderer
+//            remoteRenderer = videoRenderer
 //            peerConnectionClient.addRemoteVideoSink(videoRenderer)
+        }
+        webSocketRtcClient.setTrustedCertificate(context.resources.openRawResource(R.raw.kurento_example_certification))
+        webSocketRtcClient.connectRoom()
+    }
+
+    // 대충 기존거 안건드리려고 복사
+    fun connectPeer() {
+        if (streamingMode == StreamingMode.BROADCAST) {
+            peerConnectionClient.addTracks(
+                mediaTrackManager.audioTrack,
+                mediaTrackManager.videoTrack
+            )
         }
         webSocketRtcClient.setTrustedCertificate(context.resources.openRawResource(R.raw.kurento_example_certification))
         webSocketRtcClient.connectRoom()
@@ -100,10 +112,14 @@ class WebRtcClient(
 
     fun close() {
         webSocketRtcClient.close()
+        printLog("socket Closed")
         peerConnectionClient.close()
+        printLog("peerConnectionClient closed")
         mediaTrackManager.dispose()
+        printLog("mediaTrackManager closed")
         PeerConnectionFactory.stopInternalTracingCapture()
         PeerConnectionFactory.shutdownInternalTracer()
+        printLog("PeerConnectionFactory closed")
     }
 
     companion object {
@@ -169,6 +185,7 @@ class WebRtcClient(
             // 아래 전부 비동기
             printLog("onIceConnectionChange // ICE newState : $newState")
             if (newState == PeerConnection.IceConnectionState.CONNECTED) {
+                webRtcClientEvents.onStateChanged(WebRtcClientEvents.State.CONNECTED)
                 printLog("IceConnection Connected!")
 //            peerConnectionClient.enableStatsEvents(true, 1000)
             }

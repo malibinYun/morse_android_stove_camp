@@ -1,52 +1,85 @@
 package com.malibin.morse.presentation.viewer
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
-import com.malibin.morse.databinding.ActivityBroadCastBinding
-import com.malibin.morse.databinding.ActivityViewerBinding
-import com.malibin.morse.presentation.broadcast.BroadCastViewModel
+import androidx.appcompat.app.AppCompatActivity
+import com.malibin.morse.databinding.ActivityViewerLandscapeBinding
+import com.malibin.morse.databinding.ActivityViewerPortraitBinding
+import com.malibin.morse.presentation.utils.hideStatusBar
+import com.malibin.morse.presentation.utils.isPortraitOrientation
+import com.malibin.morse.rtc.WebRtcClientEvents
 import dagger.hilt.android.AndroidEntryPoint
-import org.webrtc.EglBase
 import org.webrtc.RendererCommon
 import org.webrtc.VideoSink
 
 @AndroidEntryPoint
 class ViewerActivity : AppCompatActivity() {
 
-    private val rootEgl = EglBase.create()
-    private var binding: ActivityViewerBinding? = null
+    private var landscapeBinding: ActivityViewerLandscapeBinding? = null
+    private var portraitBinding: ActivityViewerPortraitBinding? = null
     private val viewerViewModel: ViewerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding = ActivityViewerBinding.inflate(layoutInflater)
-        this.binding = binding
+        val binding = if (isPortraitOrientation()) {
+            ActivityViewerPortraitBinding.inflate(layoutInflater).apply { initView(this) }
+        } else {
+            ActivityViewerLandscapeBinding.inflate(layoutInflater).apply { initView(this) }
+        }
+        binding.lifecycleOwner = this
         setContentView(binding.root)
 
-        initView(binding)
-        startWatchBroadcast(binding.windowViewerSurface)
+        if (viewerViewModel.isNotInitial) attachRenderer()
+        viewerViewModel.connect()
+        viewerViewModel.rtcState.observe(this) {
+            if (it == WebRtcClientEvents.State.CONNECTED) attachRenderer()
+        }
     }
 
-    private fun initView(binding: ActivityViewerBinding) {
+    private fun initView(binding: ActivityViewerLandscapeBinding) {
+        landscapeBinding = binding
+        hideStatusBar()
         binding.windowViewerSurface.apply {
-            init(rootEgl.eglBaseContext, null)
+            init(viewerViewModel.eglBase.eglBaseContext, null)
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
             setEnableHardwareScaler(true)
             setMirror(true)
         }
     }
 
-    private fun startWatchBroadcast(renderer: VideoSink) {
-        viewerViewModel.connect(rootEgl, renderer)
+    private fun initView(binding: ActivityViewerPortraitBinding) {
+        portraitBinding = binding
+        binding.windowViewerSurface.apply {
+            init(viewerViewModel.eglBase.eglBaseContext, null)
+            setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+            setEnableHardwareScaler(true)
+            setMirror(true)
+        }
+    }
+
+    private fun attachRenderer() {
+        viewerViewModel.attachRenderer(getCurrentRenderer())
+    }
+
+    private fun detachCurrentRenderer() {
+        viewerViewModel.detachRenderer(getCurrentRenderer())
+    }
+
+    private fun getCurrentRenderer(): VideoSink {
+        return portraitBinding?.windowViewerSurface
+            ?: landscapeBinding?.windowViewerSurface
+            ?: error("cannot get video renderer")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        viewerViewModel.disconnect()
-        binding?.windowViewerSurface?.release()
-        binding = null
-        rootEgl.release()
+
+        viewerViewModel.rtcState.removeObservers(this)
+        detachCurrentRenderer()
+        landscapeBinding?.windowViewerSurface?.release()
+        landscapeBinding = null
+        portraitBinding?.windowViewerSurface?.release()
+        portraitBinding = null
     }
 }

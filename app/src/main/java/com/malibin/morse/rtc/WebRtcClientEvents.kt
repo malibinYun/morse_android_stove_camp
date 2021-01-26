@@ -6,5 +6,13 @@ package com.malibin.morse.rtc
  */
 
 interface WebRtcClientEvents {
+    fun onStateChanged(state: State)
 
+    enum class State {
+        INITIAL,
+        CONNECTED,
+        DISCONNECTED,
+        FINISH_BROADCAST,
+        ERROR;
+    }
 }

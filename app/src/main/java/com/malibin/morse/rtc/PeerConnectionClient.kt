@@ -121,6 +121,7 @@ class PeerConnectionClient(
         } catch (e: Exception) {
         }
         peerConnection.dispose()
+        println("peerConnection closed")
     }
 
     companion object {
