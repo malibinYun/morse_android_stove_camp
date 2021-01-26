@@ -28,19 +28,8 @@ class ViewerViewModel @ViewModelInject constructor(
     private val _rtcState = MutableLiveData(WebRtcClientEvents.State.INITIAL)
     val rtcState: LiveData<WebRtcClientEvents.State> = _rtcState
 
-    var isInitial: Boolean = true
-        private set
+    private var isInitial: Boolean = true
 
-    val isNotInitial: Boolean
-        get() = !isInitial
-
-    fun connect(videoRenderer: VideoSink) {
-        webRtcClient =
-            WebRtcClient(context, eglBase, StreamingMode.VIEWER, WebRtcClientEventsImpl())
-        webRtcClient.connectPeer(videoRenderer)
-    }
-
-    // 일단 위에거 대충 복사
     fun connect() {
         if (isInitial) {
             isInitial = false
@@ -49,6 +38,8 @@ class ViewerViewModel @ViewModelInject constructor(
             webRtcClient.connectPeer()
         }
     }
+
+    fun isConnected(): Boolean = rtcState.value == WebRtcClientEvents.State.CONNECTED
 
     fun attachRenderer(renderer: VideoSink) {
         webRtcClient.attachVideoRenderer(renderer)
@@ -61,7 +52,6 @@ class ViewerViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
         webRtcClient.close()
-        printLog("onCleared webRtcClient closed")
         eglBase.release()
     }
 

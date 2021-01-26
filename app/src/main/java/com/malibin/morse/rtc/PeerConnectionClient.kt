@@ -91,7 +91,7 @@ class PeerConnectionClient(
 
     fun attachRenderer(streamingMode: StreamingMode, renderer: VideoSink) = when (streamingMode) {
         StreamingMode.BROADCAST -> {
-
+            // media track manager 를 이 클래스에 집어넣는다면 이렇게 처리
         }
         StreamingMode.VIEWER -> {
             val receiveVideoTrack = findReceiveVideoTrack()
@@ -177,7 +177,6 @@ class PeerConnectionClient(
                 printLog("onCreateSuccess / Multiple SDP create.")
                 return
             }
-
             val description = preferCodec(sessionDescription.description, "VP8", false)
             val localDescription = SessionDescription(sessionDescription.type, description)
             this.localDescription = localDescription

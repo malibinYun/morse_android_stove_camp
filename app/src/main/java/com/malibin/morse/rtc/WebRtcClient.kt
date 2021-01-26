@@ -40,8 +40,6 @@ class WebRtcClient(
         MediaTrackManager(eglBase, context, peerConnectionFactory)
     }
 
-    private var remoteRenderer: VideoSink? = null
-
     private fun createPeerConnection(): PeerConnection {
         return peerConnectionFactory.createPeerConnection(
             createRtcConfiguration(),
@@ -61,22 +59,6 @@ class WebRtcClient(
         }
     }
 
-    fun connectPeer(videoRenderer: VideoSink) {
-        if (streamingMode == StreamingMode.BROADCAST) {
-            peerConnectionClient.addTracks(
-                mediaTrackManager.audioTrack,
-                mediaTrackManager.videoTrack
-            )
-            mediaTrackManager.attachLocalVideoRenderer(videoRenderer)
-        } else {
-//            remoteRenderer = videoRenderer
-//            peerConnectionClient.addRemoteVideoSink(videoRenderer)
-        }
-        webSocketRtcClient.setTrustedCertificate(context.resources.openRawResource(R.raw.kurento_example_certification))
-        webSocketRtcClient.connectRoom()
-    }
-
-    // 대충 기존거 안건드리려고 복사
     fun connectPeer() {
         if (streamingMode == StreamingMode.BROADCAST) {
             peerConnectionClient.addTracks(
@@ -90,7 +72,7 @@ class WebRtcClient(
 
     fun attachVideoRenderer(renderer: VideoSink) = when (streamingMode) {
         StreamingMode.BROADCAST -> {
-            mediaTrackManager.attachLocalVideoRenderer(renderer)
+            mediaTrackManager.attachVideoRenderer(renderer)
         }
         StreamingMode.VIEWER -> {
             peerConnectionClient.attachRenderer(streamingMode, renderer)
@@ -99,27 +81,19 @@ class WebRtcClient(
 
     fun detachVideoRenderer(renderer: VideoSink) = when (streamingMode) {
         StreamingMode.BROADCAST -> {
-            mediaTrackManager.detachLocalVideoRenderer(renderer)
+            mediaTrackManager.detachVideoRenderer(renderer)
         }
         StreamingMode.VIEWER -> {
             peerConnectionClient.detachRenderer(streamingMode, renderer)
         }
     }
 
-    fun getRemoteVideoTrack() {
-
-    }
-
     fun close() {
         webSocketRtcClient.close()
-        printLog("socket Closed")
         peerConnectionClient.close()
-        printLog("peerConnectionClient closed")
         mediaTrackManager.dispose()
-        printLog("mediaTrackManager closed")
         PeerConnectionFactory.stopInternalTracingCapture()
         PeerConnectionFactory.shutdownInternalTracer()
-        printLog("PeerConnectionFactory closed")
     }
 
     companion object {
@@ -182,12 +156,10 @@ class WebRtcClient(
         }
 
         override fun onIceConnectionChange(newState: PeerConnection.IceConnectionState?) {
-            // 아래 전부 비동기
             printLog("onIceConnectionChange // ICE newState : $newState")
             if (newState == PeerConnection.IceConnectionState.CONNECTED) {
                 webRtcClientEvents.onStateChanged(WebRtcClientEvents.State.CONNECTED)
                 printLog("IceConnection Connected!")
-//            peerConnectionClient.enableStatsEvents(true, 1000)
             }
         }
 
@@ -200,26 +172,17 @@ class WebRtcClient(
         }
 
         override fun onIceCandidate(iceCandidate: IceCandidate) {
-            // 비동기동작
             printLog("onIceCandidate // iceCandidate : $iceCandidate")
             webSocketRtcClient.sendLocalIceCandidate(iceCandidate)
         }
 
         override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate?>) {
-            // 비동기동작
             printLog("onIceCandidatesRemoved")
             webSocketRtcClient.sendLocalIceCandidateRemovals(iceCandidates)
-            // 이것도 결국 로그만 찍음
         }
 
         override fun onAddStream(mediaStream: MediaStream?) {
             printLog("onAddStream // $mediaStream")
-//            remoteRenderer ?: return
-//            printLog("remoteRenderer adding...")
-//            val remoteTrack = mediaStream?.videoTracks?.get(0) ?: error("없음")
-//            remoteTrack.setEnabled(true)
-//            remoteTrack.addSink(remoteRenderer)
-//            Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
         }
 
         override fun onRemoveStream(mediaStream: MediaStream?) {

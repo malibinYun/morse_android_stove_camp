@@ -7,6 +7,7 @@ import com.malibin.morse.databinding.ActivityViewerLandscapeBinding
 import com.malibin.morse.databinding.ActivityViewerPortraitBinding
 import com.malibin.morse.presentation.utils.hideStatusBar
 import com.malibin.morse.presentation.utils.isPortraitOrientation
+import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.rtc.WebRtcClientEvents
 import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.RendererCommon
@@ -30,7 +31,6 @@ class ViewerActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         setContentView(binding.root)
 
-        if (viewerViewModel.isNotInitial) attachRenderer()
         viewerViewModel.connect()
         viewerViewModel.rtcState.observe(this) {
             if (it == WebRtcClientEvents.State.CONNECTED) attachRenderer()
@@ -58,6 +58,11 @@ class ViewerActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (viewerViewModel.isConnected()) attachRenderer()
+    }
+
     private fun attachRenderer() {
         viewerViewModel.attachRenderer(getCurrentRenderer())
     }
@@ -72,11 +77,15 @@ class ViewerActivity : AppCompatActivity() {
             ?: error("cannot get video renderer")
     }
 
+    override fun onStop() {
+        super.onStop()
+        detachCurrentRenderer()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
         viewerViewModel.rtcState.removeObservers(this)
-        detachCurrentRenderer()
         landscapeBinding?.windowViewerSurface?.release()
         landscapeBinding = null
         portraitBinding?.windowViewerSurface?.release()

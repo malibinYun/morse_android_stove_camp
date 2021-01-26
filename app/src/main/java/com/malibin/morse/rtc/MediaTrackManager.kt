@@ -88,11 +88,11 @@ class MediaTrackManager(
         return cameraEnumerator.createCapturer(deviceName, null)
     }
 
-    fun attachLocalVideoRenderer(renderer: VideoSink) {
+    fun attachVideoRenderer(renderer: VideoSink) {
         videoTrack.addSink(renderer)
     }
 
-    fun detachLocalVideoRenderer(renderer: VideoSink) {
+    fun detachVideoRenderer(renderer: VideoSink) {
         videoTrack.removeSink(renderer)
     }
 

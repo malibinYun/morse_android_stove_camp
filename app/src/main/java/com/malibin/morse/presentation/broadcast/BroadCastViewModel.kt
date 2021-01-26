@@ -2,6 +2,8 @@ package com.malibin.morse.presentation.broadcast
 
 import android.content.Context
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
@@ -16,24 +18,41 @@ import org.webrtc.VideoSink
  */
 
 class BroadCastViewModel @ViewModelInject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    val eglBase: EglBase,
 ) : ViewModel() {
 
     private lateinit var webRtcClient: WebRtcClient
 
-    fun connect(eglBase: EglBase, videoRenderer: VideoSink) {
+    private val _rtcState = MutableLiveData(WebRtcClientEvents.State.INITIAL)
+    val rtcState: LiveData<WebRtcClientEvents.State> = _rtcState
+
+    fun connect() {
         webRtcClient =
             WebRtcClient(context, eglBase, StreamingMode.BROADCAST, WebRtcClientEventsImpl())
-        webRtcClient.connectPeer(videoRenderer)
+        webRtcClient.connectPeer()
+    }
+
+    fun attachRenderer(renderer: VideoSink) {
+        webRtcClient.attachVideoRenderer(renderer)
+    }
+
+    fun detachRenderer(renderer: VideoSink) {
+        webRtcClient.detachVideoRenderer(renderer)
     }
 
     fun disconnect() {
         webRtcClient.close()
     }
 
-    private inner class WebRtcClientEventsImpl : WebRtcClientEvents{
+    override fun onCleared() {
+        super.onCleared()
+        eglBase.release()
+    }
+
+    private inner class WebRtcClientEventsImpl : WebRtcClientEvents {
         override fun onStateChanged(state: WebRtcClientEvents.State) {
-            println("onStateChanged $state")
+            _rtcState.postValue(state)
         }
     }
 }

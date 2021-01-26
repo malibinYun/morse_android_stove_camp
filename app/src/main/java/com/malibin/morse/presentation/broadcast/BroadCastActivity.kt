@@ -10,14 +10,13 @@ import com.malibin.morse.databinding.ActivityBroadCastBinding
 import com.malibin.morse.presentation.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import com.malibin.morse.localSdp
+import com.malibin.morse.rtc.WebRtcClientEvents
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
 import org.webrtc.VideoSink
 
 @AndroidEntryPoint
 class BroadCastActivity : AppCompatActivity() {
-
-    private val rootEgl = EglBase.create()
     private var binding: ActivityBroadCastBinding? = null
     private val broadCastViewModel: BroadCastViewModel by viewModels()
 
@@ -35,6 +34,10 @@ class BroadCastActivity : AppCompatActivity() {
 
         if (isPermissionsGranted()) startBroadCast()
         else askPermissions()
+
+        broadCastViewModel.rtcState.observe(this) {
+            if (it == WebRtcClientEvents.State.CONNECTED) attachRenderer()
+        }
     }
 
     private fun hasNoCamera(): Boolean =
@@ -42,7 +45,7 @@ class BroadCastActivity : AppCompatActivity() {
 
     private fun initView(binding: ActivityBroadCastBinding) {
         binding.windowBroadcastSurface.apply {
-            init(rootEgl.eglBaseContext, null) // eglBaseContext가 Viewmodel에서도 필요함.
+            init(broadCastViewModel.eglBase.eglBaseContext, null)
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
             setEnableHardwareScaler(true)
             setMirror(true)
@@ -64,7 +67,7 @@ class BroadCastActivity : AppCompatActivity() {
     }
 
     private fun startBroadCast() {
-        broadCastViewModel.connect(rootEgl, getLocalRenderer())
+        broadCastViewModel.connect()
     }
 
     private fun showPermissionRejected() {
@@ -83,18 +86,26 @@ class BroadCastActivity : AppCompatActivity() {
         return isCameraGranted == PERMISSION_GRANTED && isMicGranted == PERMISSION_GRANTED
     }
 
-    private fun getLocalRenderer(): VideoSink = VideoSink {
-        requireBinding().windowBroadcastSurface.onFrame(it)
+    private fun attachRenderer() {
+        broadCastViewModel.attachRenderer(getCurrentRenderer())
+    }
+
+    private fun detachCurrentRenderer() {
+        broadCastViewModel.detachRenderer(getCurrentRenderer())
+    }
+
+    private fun getCurrentRenderer(): VideoSink {
+        return requireBinding().windowBroadcastSurface
     }
 
     private fun requireBinding() = binding ?: error("activity not inflated yet")
 
     override fun onDestroy() {
         super.onDestroy()
+        detachCurrentRenderer()
         broadCastViewModel.disconnect()
         binding?.windowBroadcastSurface?.release()
         binding = null
-        rootEgl.release()
     }
 
     companion object {
