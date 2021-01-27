@@ -16,14 +16,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Morse"
         android:usesCleartextTraffic="true">
-        <activity android:name=".presentation.rooms.create.CreateRoomActivity"></activity>
-        <activity android:name=".presentation.rooms.RoomsActivity" />
-        <activity android:name=".presentation.TestActivity">
+        <activity android:name=".presentation.rooms.create.CreateRoomActivity" />
+        <activity android:name=".presentation.rooms.RoomsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".presentation.TestActivity">
+
         </activity>
         <activity android:name=".presentation.viewer.ViewerActivity" />
         <activity

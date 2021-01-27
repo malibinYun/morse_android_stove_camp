@@ -3,6 +3,7 @@ package com.malibin.morse.presentation.rooms
 import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -11,10 +12,12 @@ import com.malibin.morse.data.entity.Room
 import com.malibin.morse.databinding.ActivityRoomsBinding
 import com.malibin.morse.databinding.ItemRoomBinding
 import com.malibin.morse.presentation.rooms.create.CreateRoomActivity
+import com.malibin.morse.presentation.viewer.ViewerActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RoomsActivity : AppCompatActivity() {
-
-    private var roomsAdapter: RoomsAdapter? = null
+    private val roomsViewModel: RoomsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,25 +25,30 @@ class RoomsActivity : AppCompatActivity() {
         val binding = ActivityRoomsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initView(binding)
+
+        roomsViewModel.loadAllRooms()
     }
 
     private fun initView(binding: ActivityRoomsBinding) {
-        val adapter = RoomsAdapter().apply { roomsAdapter = this }
+        val adapter = RoomsAdapter()
         binding.lifecycleOwner = this
         binding.listRoom.adapter = adapter
-        binding.buttonCreateRoom.setOnClickListener { startActivityOf(CreateRoomActivity::class.java) }
+        binding.buttonCreateRoom.setOnClickListener { deployActivityOf(CreateRoomActivity::class.java) }
         binding.buttonMypage.setOnClickListener { }
         binding.buttonMypage.setOnClickListener { }
+        roomsViewModel.rooms.observe(this) { adapter.submitList(it) }
     }
 
-    private fun <T> startActivityOf(targetActivity: Class<T>) {
+    private fun <T> deployActivityOf(targetActivity: Class<T>) {
         val intent = Intent(this, targetActivity)
         startActivity(intent)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        roomsAdapter = null
+    private fun deployViewerActivity(room: Room) {
+        val intent = Intent(this, ViewerActivity::class.java).apply {
+            putExtra(ViewerActivity.KEY_ROOM, room)
+        }
+        startActivity(intent)
     }
 
     private inner class RoomsAdapter : ListAdapter<Room, RoomViewHolder>(ItemDiffCallback()) {
@@ -69,6 +77,7 @@ class RoomsActivity : AppCompatActivity() {
 
         fun bind(room: Room) {
             binding.room = room
+            binding.root.setOnClickListener { deployViewerActivity(room) }
         }
     }
 }

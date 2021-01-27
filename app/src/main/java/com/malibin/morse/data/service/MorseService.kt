@@ -1,5 +1,6 @@
 package com.malibin.morse.data.service
 
+import com.malibin.morse.data.entity.Room
 import com.malibin.morse.data.service.params.ChangeNicknameParams
 import com.malibin.morse.data.service.params.ChangePasswordParams
 import com.malibin.morse.data.service.params.CheckEmailParams
@@ -72,6 +73,9 @@ interface MorseService {
     suspend fun deleteAccount(
         @Header("token") token: String,
     )
+
+    @POST("live/search-all")
+    suspend fun getAllRooms(): BaseResponse<List<Room>>
 
     companion object {
         const val BASE_URL = "http://downsups.onstove.com:8005"

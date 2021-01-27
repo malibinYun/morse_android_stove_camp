@@ -46,7 +46,7 @@
             android:id="@+id/textView10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{room.viewerCount}"
+            android:text="@{String.valueOf(room.viewerCount)}"
             app:layout_constraintEnd_toEndOf="@+id/textView8"
             app:layout_constraintTop_toTopOf="@+id/textView6"
             tools:text="0" />

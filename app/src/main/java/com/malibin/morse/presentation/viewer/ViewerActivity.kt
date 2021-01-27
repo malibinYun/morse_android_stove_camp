@@ -90,4 +90,8 @@ class ViewerActivity : AppCompatActivity() {
         portraitBinding?.windowViewerSurface?.release()
         portraitBinding = null
     }
+
+    companion object {
+        const val KEY_ROOM = "KEY_ROOM"
+    }
 }
