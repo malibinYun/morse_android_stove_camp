@@ -57,6 +57,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     
     // LifeCycle
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
@@ -64,9 +65,6 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:1.1.1"
 
     // WebRTC
-//    implementation files('libs/audio_device_java.jar')
-//    implementation files('libs/base_java.jar')
-//    implementation files('libs/libjingle_peerconnection.jar')
     implementation 'org.webrtc:google-webrtc:1.0.+'
 
     // WebSocket

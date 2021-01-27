@@ -36,7 +36,11 @@ class RoomsActivity : AppCompatActivity() {
         binding.buttonCreateRoom.setOnClickListener { deployActivityOf(CreateRoomActivity::class.java) }
         binding.buttonMypage.setOnClickListener { }
         binding.buttonMypage.setOnClickListener { }
-        roomsViewModel.rooms.observe(this) { adapter.submitList(it) }
+        binding.windowSwipeRefresh.setOnRefreshListener { roomsViewModel.loadAllRooms() }
+        roomsViewModel.rooms.observe(this) {
+            adapter.submitList(it)
+            binding.windowSwipeRefresh.isRefreshing = false
+        }
     }
 
     private fun <T> deployActivityOf(targetActivity: Class<T>) {
