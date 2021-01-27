@@ -1,13 +1,16 @@
 package com.malibin.morse.presentation.viewer
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.malibin.morse.R
+import com.malibin.morse.data.entity.Room
 import com.malibin.morse.databinding.ActivityViewerLandscapeBinding
 import com.malibin.morse.databinding.ActivityViewerPortraitBinding
 import com.malibin.morse.presentation.utils.hideStatusBar
 import com.malibin.morse.presentation.utils.isPortraitOrientation
-import com.malibin.morse.presentation.utils.printLog
+import com.malibin.morse.presentation.utils.showToast
 import com.malibin.morse.rtc.WebRtcClientEvents
 import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.RendererCommon
@@ -34,6 +37,8 @@ class ViewerActivity : AppCompatActivity() {
         viewerViewModel.connect()
         viewerViewModel.rtcState.observe(this) {
             if (it == WebRtcClientEvents.State.CONNECTED) attachRenderer()
+            if (it == WebRtcClientEvents.State.ALREADY_CLOSED) onBroadCastAlreadyClosed()
+            if (it == WebRtcClientEvents.State.FINISH_BROADCAST) onBroadCastClosed()
         }
     }
 
@@ -57,6 +62,8 @@ class ViewerActivity : AppCompatActivity() {
         }
     }
 
+    private fun getRoom(): Room = intent.getSerializableExtra(KEY_ROOM) as Room
+
     override fun onResume() {
         super.onResume()
         if (viewerViewModel.isConnected()) attachRenderer()
@@ -76,6 +83,18 @@ class ViewerActivity : AppCompatActivity() {
             ?: error("cannot get video renderer")
     }
 
+    private fun onBroadCastAlreadyClosed() {
+        showToast(R.string.broadcast_already_closed)
+        val intent = Intent().apply { putExtra(KEY_ROOM, getRoom()) }
+        setResult(RESULT_ALREADY_CLOSED, intent)
+        finish()
+    }
+
+    private fun onBroadCastClosed() {
+        showToast(R.string.broadcast_closed)
+        finish()
+    }
+
     override fun onStop() {
         super.onStop()
         detachCurrentRenderer()
@@ -93,5 +112,7 @@ class ViewerActivity : AppCompatActivity() {
 
     companion object {
         const val KEY_ROOM = "KEY_ROOM"
+        const val RESULT_ALREADY_CLOSED = 100
+        const val REQUEST_CODE = 1000
     }
 }

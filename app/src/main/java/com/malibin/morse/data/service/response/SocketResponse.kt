@@ -17,6 +17,8 @@ data class SocketResponse(
     val responseId: ID
         get() = ID.findBy(id)
 
+    fun isRejected(): Boolean = response == "rejected"
+
     enum class ID(
         private val value: String
     ) {

@@ -96,9 +96,11 @@ class WebRtcClient(
     }
 
     fun close() {
+        if (streamingMode == StreamingMode.BROADCAST) {
+            mediaTrackManager.dispose()
+        }
         webSocketRtcClient.close()
         peerConnectionClient.close()
-        mediaTrackManager.dispose()
         PeerConnectionFactory.stopInternalTracingCapture()
         PeerConnectionFactory.shutdownInternalTracer()
     }
@@ -124,17 +126,22 @@ class WebRtcClient(
 
             when (response.responseId) {
                 SocketResponse.ID.PRESENTER_RESPONSE, SocketResponse.ID.VIEWER_RESPONSE -> {
-                    printLog("onMessage ${response.responseId} called")
+                    if (response.isRejected()) {
+                        webRtcClientEvents.onStateChanged(WebRtcClientEvents.State.ALREADY_CLOSED)
+                        return
+                    }
                     val sdp = SessionDescription(SessionDescription.Type.ANSWER, response.sdpAnswer)
                     peerConnectionClient.setRemoteDescription(sdp)
                 }
                 SocketResponse.ID.ICE_CANDIDATE -> {
-                    printLog("onMessage ICE_CANDIDATE called")
                     val candidateResponse = response.candidate ?: error("candidate cannot be null")
                     peerConnectionClient.addRemoteIceCandidate(candidateResponse.toIceCandidate())
                 }
                 SocketResponse.ID.STOP_COMMUNICATION -> {
                     webRtcClientEvents.onStateChanged(WebRtcClientEvents.State.FINISH_BROADCAST)
+                }
+                SocketResponse.ID.ERROR_RESPONSE -> {
+                    webRtcClientEvents.onStateChanged(WebRtcClientEvents.State.ERROR)
                 }
             }
         }

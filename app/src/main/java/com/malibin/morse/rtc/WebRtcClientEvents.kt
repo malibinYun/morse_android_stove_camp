@@ -13,6 +13,7 @@ interface WebRtcClientEvents {
         CONNECTED,
         DISCONNECTED,
         FINISH_BROADCAST,
+        ALREADY_CLOSED,
         ERROR;
     }
 }

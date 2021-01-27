@@ -19,4 +19,13 @@ class RoomsViewModel @ViewModelInject constructor(
         val allRooms = roomsRepository.getAllRooms()
         _rooms.postValue(allRooms)
     }
+
+    fun removeRoom(room: Room) {
+        val currentRooms = getCurrentRooms()
+        _rooms.value = currentRooms.apply { remove(room) }
+    }
+
+    private fun getCurrentRooms(): MutableList<Room> {
+        return _rooms.value?.toMutableList() ?: mutableListOf()
+    }
 }

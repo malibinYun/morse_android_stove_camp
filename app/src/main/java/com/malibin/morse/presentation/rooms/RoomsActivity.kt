@@ -48,7 +48,15 @@ class RoomsActivity : AppCompatActivity() {
         val intent = Intent(this, ViewerActivity::class.java).apply {
             putExtra(ViewerActivity.KEY_ROOM, room)
         }
-        startActivity(intent)
+        startActivityForResult(intent, ViewerActivity.REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ViewerActivity.REQUEST_CODE && resultCode == ViewerActivity.RESULT_ALREADY_CLOSED) {
+            val room = data?.getSerializableExtra(ViewerActivity.KEY_ROOM) as? Room ?: return
+            roomsViewModel.removeRoom(room)
+        }
     }
 
     private inner class RoomsAdapter : ListAdapter<Room, RoomViewHolder>(ItemDiffCallback()) {
