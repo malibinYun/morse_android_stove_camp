@@ -2,16 +2,16 @@ package com.malibin.morse.presentation.broadcast
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.malibin.morse.R
 import com.malibin.morse.databinding.ActivityBroadCastBinding
+import com.malibin.morse.presentation.utils.hideStatusBar
 import com.malibin.morse.presentation.utils.showToast
-import dagger.hilt.android.AndroidEntryPoint
-import com.malibin.morse.localSdp
 import com.malibin.morse.rtc.WebRtcClientEvents
-import org.webrtc.EglBase
+import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.RendererCommon
 import org.webrtc.VideoSink
 
@@ -44,12 +44,14 @@ class BroadCastActivity : AppCompatActivity() {
         !packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
 
     private fun initView(binding: ActivityBroadCastBinding) {
+        hideStatusBar()
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         binding.windowBroadcastSurface.apply {
             init(broadCastViewModel.eglBase.eglBaseContext, null)
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
             setEnableHardwareScaler(true)
-            setMirror(true)
         }
+        binding.buttonSwitchCamera.setOnClickListener { broadCastViewModel.switchCamera() }
     }
 
     override fun onRequestPermissionsResult(

@@ -4,9 +4,9 @@ import android.content.Context
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
 import org.webrtc.Camera2Enumerator
+import org.webrtc.CameraVideoCapturer
 import org.webrtc.EglBase
 import org.webrtc.MediaConstraints
-import org.webrtc.MediaSource
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoCapturer
@@ -94,6 +94,10 @@ class MediaTrackManager(
 
     fun detachVideoRenderer(renderer: VideoSink) {
         videoTrack.removeSink(renderer)
+    }
+
+    fun switchCamera() {
+        (videoCapturer as CameraVideoCapturer).switchCamera(null)
     }
 
     fun dispose() {

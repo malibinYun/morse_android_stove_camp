@@ -44,7 +44,6 @@ class ViewerActivity : AppCompatActivity() {
             init(viewerViewModel.eglBase.eglBaseContext, null)
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
             setEnableHardwareScaler(true)
-            setMirror(true)
         }
     }
 

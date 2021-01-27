@@ -41,6 +41,10 @@ class BroadCastViewModel @ViewModelInject constructor(
         webRtcClient.detachVideoRenderer(renderer)
     }
 
+    fun switchCamera() {
+        webRtcClient.switchCamera()
+    }
+
     fun disconnect() {
         webRtcClient.close()
     }

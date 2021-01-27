@@ -8,5 +8,5 @@ package com.malibin.morse.data.service.response
 data class BaseResponse<T>(
     val timestamp: String,
     val message: String,
-    val data: T
+    val data: T,
 )

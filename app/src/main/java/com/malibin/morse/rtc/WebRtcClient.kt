@@ -2,7 +2,6 @@ package com.malibin.morse.rtc
 
 import android.content.Context
 import com.malibin.morse.R
-import com.malibin.morse.data.entity.ID
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
 import org.java_websocket.handshake.ServerHandshake
@@ -88,6 +87,10 @@ class WebRtcClient(
         }
     }
 
+    fun switchCamera() {
+        mediaTrackManager.switchCamera()
+    }
+
     fun close() {
         webSocketRtcClient.close()
         peerConnectionClient.close()
@@ -116,18 +119,18 @@ class WebRtcClient(
             if (response == null) return
 
             when (response.responseId) {
-                ID.PRESENTER_RESPONSE, ID.VIEWER_RESPONSE -> {
+                SocketResponse.ID.PRESENTER_RESPONSE, SocketResponse.ID.VIEWER_RESPONSE -> {
                     printLog("onMessage ${response.responseId} called")
                     val sdp = SessionDescription(SessionDescription.Type.ANSWER, response.sdpAnswer)
                     peerConnectionClient.setRemoteDescription(sdp)
                 }
-                ID.ICE_CANDIDATE -> {
+                SocketResponse.ID.ICE_CANDIDATE -> {
                     printLog("onMessage ICE_CANDIDATE called")
                     val candidateResponse = response.candidate ?: error("candidate cannot be null")
                     peerConnectionClient.addRemoteIceCandidate(candidateResponse.toIceCandidate())
                 }
-                ID.STOP_COMMUNICATION -> {
-                    // 멈추기
+                SocketResponse.ID.STOP_COMMUNICATION -> {
+                    webRtcClientEvents.onStateChanged(WebRtcClientEvents.State.FINISH_BROADCAST)
                 }
             }
         }
