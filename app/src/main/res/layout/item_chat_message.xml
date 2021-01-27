@@ -22,10 +22,11 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:text="TextView"
+            android:breakStrategy="simple"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="텍스트를 써봅니다 기나긴 텍스트를요 띄어쓰기를 쓰지않고한번계속해서써볼까요" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

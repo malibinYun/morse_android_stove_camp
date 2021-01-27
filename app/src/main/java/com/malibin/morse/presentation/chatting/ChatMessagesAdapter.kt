@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.databinding.ItemChatMessageBinding
+import com.malibin.morse.presentation.utils.printLog
 
 /**
  * Created By Malibin
@@ -43,6 +44,7 @@ class ChatMessagesAdapter(
         messages.add(chatMessage)
         if (nicknameColors[chatMessage.userNickname] == null) {
             nicknameColors[chatMessage.userNickname] = randomColorGenerator.createColorCode()
+                .also { printLog("random colorCode : $it") }
         }
         notifyItemInserted(itemCount - 1)
     }
@@ -75,7 +77,7 @@ class ChatMessagesAdapter(
                 ChatMessage.Color.BLACK -> Color.BLACK
                 ChatMessage.Color.WHITE -> Color.WHITE
             }
-            val messageSpan = SpannableString(" : ${chatMessage.message}")
+            val messageSpan = SpannableString(" : ${chatMessage.message}".replace(" ", "\u00A0"))
             messageSpan.setSpan(
                 ForegroundColorSpan(messageColor),
                 0,

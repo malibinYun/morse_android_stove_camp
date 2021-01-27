@@ -5,9 +5,12 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.malibin.morse.R
+import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.data.entity.Room
 import com.malibin.morse.databinding.ActivityViewerLandscapeBinding
 import com.malibin.morse.databinding.ActivityViewerPortraitBinding
+import com.malibin.morse.presentation.chatting.ChatMessagesAdapter
+import com.malibin.morse.presentation.chatting.RandomColorGenerator
 import com.malibin.morse.presentation.utils.hideStatusBar
 import com.malibin.morse.presentation.utils.isPortraitOrientation
 import com.malibin.morse.presentation.utils.showToast
@@ -21,10 +24,15 @@ class ViewerActivity : AppCompatActivity() {
 
     private var landscapeBinding: ActivityViewerLandscapeBinding? = null
     private var portraitBinding: ActivityViewerPortraitBinding? = null
+    private var chatMessagesAdapter: ChatMessagesAdapter? = null
+
     private val viewerViewModel: ViewerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val chatMessagesAdapter = ChatMessagesAdapter(RandomColorGenerator())
+        this.chatMessagesAdapter = chatMessagesAdapter
 
         val binding = if (isPortraitOrientation()) {
             ActivityViewerPortraitBinding.inflate(layoutInflater).apply { initView(this) }
@@ -59,6 +67,12 @@ class ViewerActivity : AppCompatActivity() {
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
             setEnableHardwareScaler(true)
             setMirror(true)
+        }
+        binding.listChatting.adapter = chatMessagesAdapter
+        binding.buttonSend.setOnClickListener {
+            chatMessagesAdapter?.appendChatMessage(
+                ChatMessage(binding.textInput.text.toString(), "말리빈")
+            )
         }
     }
 

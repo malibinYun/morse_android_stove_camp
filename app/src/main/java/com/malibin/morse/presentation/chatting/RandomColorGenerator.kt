@@ -12,6 +12,6 @@ class RandomColorGenerator : ColorGenerator {
         val red = Random.nextInt(0, 256)
         val green = Random.nextInt(0, 256)
         val blue = Random.nextInt(0, 256)
-        return "#%X%X%X".format(red, green, blue)
+        return "#%02X%02X%02X".format(red, green, blue)
     }
 }

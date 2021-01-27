@@ -24,10 +24,12 @@
             android:id="@+id/list_chatting"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/text_input"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/window_viewer_surface" />
+            app:layout_constraintTop_toBottomOf="@id/window_viewer_surface"
+            tools:listitem="@layout/item_chat_message" />
 
         <EditText
             android:id="@+id/text_input"
