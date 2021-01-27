@@ -46,12 +46,13 @@ class BroadCastActivity : AppCompatActivity() {
     private fun initView(binding: ActivityBroadCastBinding) {
         hideStatusBar()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        binding.viewModel = broadCastViewModel
+        binding.lifecycleOwner = this
         binding.windowBroadcastSurface.apply {
             init(broadCastViewModel.eglBase.eglBaseContext, null)
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
             setEnableHardwareScaler(true)
         }
-        binding.buttonSwitchCamera.setOnClickListener { broadCastViewModel.switchCamera() }
     }
 
     override fun onRequestPermissionsResult(
@@ -104,6 +105,7 @@ class BroadCastActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+
         detachCurrentRenderer()
         broadCastViewModel.disconnect()
         binding?.windowBroadcastSurface?.release()

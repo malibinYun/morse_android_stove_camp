@@ -26,15 +26,20 @@ fun Context.getOrientation(): Int {
     return resources.configuration.orientation
 }
 
-fun Context.isPortraitOrientation(): Boolean{
+fun Context.isPortraitOrientation(): Boolean {
     return getOrientation() == Configuration.ORIENTATION_PORTRAIT
 }
 
-fun Activity.hideStatusBar(){
+fun Activity.hideStatusBar() {
     window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
 }
 
 @BindingAdapter("isEnabled")
 fun bindingIsEnabled(view: View, isEnabled: Boolean?) {
     view.isEnabled = isEnabled ?: false
+}
+
+@BindingAdapter("isActivated")
+fun bindingIsActivated(view: View, isActivated: Boolean?) {
+    view.isActivated = isActivated ?: false
 }

@@ -27,6 +27,9 @@ class BroadCastViewModel @ViewModelInject constructor(
     private val _rtcState = MutableLiveData(WebRtcClientEvents.State.INITIAL)
     val rtcState: LiveData<WebRtcClientEvents.State> = _rtcState
 
+    private val _isMicActivated = MutableLiveData(true)
+    val isMicActivated: LiveData<Boolean> = _isMicActivated
+
     fun connect() {
         webRtcClient =
             WebRtcClient(context, eglBase, StreamingMode.BROADCAST, WebRtcClientEventsImpl())
@@ -43,6 +46,12 @@ class BroadCastViewModel @ViewModelInject constructor(
 
     fun switchCamera() {
         webRtcClient.switchCamera()
+    }
+
+    fun toggleMic() {
+        val isMicActivated = _isMicActivated.value ?: error("_isMicActivated cannot be null")
+        _isMicActivated.value = !isMicActivated
+        webRtcClient.toggleMic(!isMicActivated)
     }
 
     fun disconnect() {

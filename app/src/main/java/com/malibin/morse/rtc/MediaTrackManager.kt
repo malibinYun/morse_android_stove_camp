@@ -100,6 +100,10 @@ class MediaTrackManager(
         (videoCapturer as CameraVideoCapturer).switchCamera(null)
     }
 
+    fun toggleMic(isEnabled: Boolean) {
+        audioTrack.setEnabled(isEnabled)
+    }
+
     fun dispose() {
         audioTrack.dispose()
         audioSource.dispose()

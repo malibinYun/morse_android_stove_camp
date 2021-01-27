@@ -91,6 +91,10 @@ class WebRtcClient(
         mediaTrackManager.switchCamera()
     }
 
+    fun toggleMic(isEnabled: Boolean) {
+        mediaTrackManager.toggleMic(isEnabled)
+    }
+
     fun close() {
         webSocketRtcClient.close()
         peerConnectionClient.close()
