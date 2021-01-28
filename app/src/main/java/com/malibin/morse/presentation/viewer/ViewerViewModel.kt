@@ -5,6 +5,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
@@ -28,6 +29,9 @@ class ViewerViewModel @ViewModelInject constructor(
     private val _rtcState = MutableLiveData(WebRtcClientEvents.State.INITIAL)
     val rtcState: LiveData<WebRtcClientEvents.State> = _rtcState
 
+    private val _chatMessages = MutableLiveData<List<ChatMessage>>()
+    val chatMessages: LiveData<List<ChatMessage>> = _chatMessages
+
     private var isInitial: Boolean = true
 
     fun connect() {
@@ -47,6 +51,15 @@ class ViewerViewModel @ViewModelInject constructor(
 
     fun detachRenderer(renderer: VideoSink) {
         webRtcClient.detachVideoRenderer(renderer)
+    }
+
+    fun sendChatMessage(message: String) {
+        //TODO http로 보내야함
+        // TODO 닉네임 가져오는 로직잇어야함
+        val chatMessage = ChatMessage(message, "말리빈")
+        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
+        currentChatMessages.add(chatMessage)
+        _chatMessages.value = currentChatMessages
     }
 
     override fun onCleared() {

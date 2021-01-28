@@ -42,11 +42,14 @@ class ViewerActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         setContentView(binding.root)
 
-        viewerViewModel.connect()
+//        viewerViewModel.connect()
         viewerViewModel.rtcState.observe(this) {
             if (it == WebRtcClientEvents.State.CONNECTED) attachRenderer()
             if (it == WebRtcClientEvents.State.ALREADY_CLOSED) onBroadCastAlreadyClosed()
             if (it == WebRtcClientEvents.State.FINISH_BROADCAST) onBroadCastClosed()
+        }
+        viewerViewModel.chatMessages.observe(this) {
+            chatMessagesAdapter.submitList(it) { scrollBottomOfChatting() }
         }
     }
 
@@ -69,10 +72,19 @@ class ViewerActivity : AppCompatActivity() {
             setMirror(true)
         }
         binding.listChatting.adapter = chatMessagesAdapter
+        binding.listChatting.itemAnimator = null
         binding.buttonSend.setOnClickListener {
-            chatMessagesAdapter?.appendChatMessage(
-                ChatMessage(binding.textInput.text.toString(), "말리빈")
-            )
+            viewerViewModel.sendChatMessage(binding.textInput.text.toString())
+            binding.textInput.setText("")
+        }
+    }
+
+    private fun scrollBottomOfChatting() {
+        val listChatting = portraitBinding?.listChatting
+//            ?: landscapeBinding?.listChatting
+            ?: error("cannot find recyclerView")
+        if (!listChatting.canScrollVertically(SCROLL_DOWN)) {
+            listChatting.scrollToPosition(chatMessagesAdapter?.getLastPosition() ?: return)
         }
     }
 
@@ -128,5 +140,7 @@ class ViewerActivity : AppCompatActivity() {
         const val KEY_ROOM = "KEY_ROOM"
         const val RESULT_ALREADY_CLOSED = 100
         const val REQUEST_CODE = 1000
+
+        private const val SCROLL_DOWN = 1
     }
 }

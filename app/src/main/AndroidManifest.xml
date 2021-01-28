@@ -18,16 +18,18 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".presentation.rooms.create.CreateRoomActivity" />
         <activity android:name=".presentation.rooms.RoomsActivity">
+
+        </activity>
+        <activity android:name=".presentation.TestActivity">
+
+        </activity>
+        <activity android:name=".presentation.viewer.ViewerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.TestActivity">
-
-        </activity>
-        <activity android:name=".presentation.viewer.ViewerActivity" />
         <activity
             android:name=".presentation.broadcast.BroadCastActivity"
             android:screenOrientation="landscape" />

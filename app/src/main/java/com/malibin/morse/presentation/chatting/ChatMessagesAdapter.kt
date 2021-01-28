@@ -9,10 +9,11 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.databinding.ItemChatMessageBinding
-import com.malibin.morse.presentation.utils.printLog
 
 /**
  * Created By Malibin
@@ -21,10 +22,9 @@ import com.malibin.morse.presentation.utils.printLog
 
 class ChatMessagesAdapter(
     private val randomColorGenerator: ColorGenerator,
-) : RecyclerView.Adapter<ChatMessagesAdapter.ViewHolder>() {
+) : ListAdapter<ChatMessage, ChatMessagesAdapter.ViewHolder>(DiffItemCallback()) {
 
     private val nicknameColors = mutableMapOf<String, String>()
-    private val messages = mutableListOf<ChatMessage>()
 
     var chatMessageColor = ChatMessage.Color.BLACK
 
@@ -35,19 +35,14 @@ class ChatMessagesAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(messages[position])
-    }
-
-    override fun getItemCount(): Int = messages.size
-
-    fun appendChatMessage(chatMessage: ChatMessage) {
-        messages.add(chatMessage)
+        val chatMessage = getItem(position)
         if (nicknameColors[chatMessage.userNickname] == null) {
             nicknameColors[chatMessage.userNickname] = randomColorGenerator.createColorCode()
-                .also { printLog("random colorCode : $it") }
         }
-        notifyItemInserted(itemCount - 1)
+        holder.bind(chatMessage)
     }
+
+    fun getLastPosition(): Int = itemCount - 1
 
     inner class ViewHolder(
         private val binding: ItemChatMessageBinding
@@ -85,6 +80,16 @@ class ChatMessagesAdapter(
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             return TextUtils.concat(nicknameSpan, messageSpan)
+        }
+    }
+
+    private class DiffItemCallback : DiffUtil.ItemCallback<ChatMessage>() {
+        override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
+            return oldItem == newItem
         }
     }
 }
