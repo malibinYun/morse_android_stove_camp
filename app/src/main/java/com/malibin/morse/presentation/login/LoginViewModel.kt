@@ -26,6 +26,19 @@ class LoginViewModel @ViewModelInject constructor(
     val isSuccess = SingleLiveEvent<Any>()
     val toastMessage = SingleLiveEvent<Any>()
 
+    fun autoLogin() = viewModelScope.launch {
+        isLoading.value = true
+        if (authRepository.isSavedTokenValid()) {
+            isLoading.value = false
+            isSuccess.call()
+            return@launch
+        }
+        if (authRepository.refreshTokens() != null) {
+            isSuccess.call()
+        }
+        isLoading.value = false
+    }
+
     fun login() {
         isLoading.value = true
         val email = this.email.value ?: error("email cannot be null")

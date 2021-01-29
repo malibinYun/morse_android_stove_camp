@@ -26,45 +26,37 @@ class AuthRepository @Inject constructor(
     private val morseService: MorseService,
     private val dataStore: DataStore<Preferences>
 ) {
-    suspend fun checkNickname(nickname: String): Boolean {
-        withContext(Dispatchers.IO) {
-            morseService.checkNickname(CheckNicknameParams(nickname))
-            return@withContext true
-        }
-        return false
+    suspend fun checkNickname(nickname: String): Boolean = withContext(Dispatchers.IO) {
+        return@withContext morseService.checkNickname(CheckNicknameParams(nickname)).isSuccessful
     }
 
-    suspend fun checkEmail(email: String): Boolean {
-        withContext(Dispatchers.IO) {
-            morseService.checkEmail(CheckEmailParams(email))
-            return@withContext true
-        }
-        return false
+    suspend fun checkEmail(email: String): Boolean = withContext(Dispatchers.IO) {
+        return@withContext morseService.checkEmail(CheckEmailParams(email)).isSuccessful
     }
 
-    suspend fun verifyEmail(email: String, verifyCode: String): Boolean {
-        withContext(Dispatchers.IO) {
-            morseService.verifyEmail(VerifyEmailParams(email, verifyCode))
-            return@withContext true
-        }
-        return false
+    suspend fun verifyEmail(
+        email: String,
+        verifyCode: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        return@withContext morseService
+            .verifyEmail(VerifyEmailParams(email, verifyCode))
+            .isSuccessful
     }
 
-    suspend fun signUp(email: String, password: String, nickname: String): Boolean {
-        withContext(Dispatchers.IO) {
-            morseService.signUp(SignUpParams(email, password, nickname))
-            return@withContext true
-        }
-        return false
+    suspend fun signUp(
+        email: String,
+        password: String,
+        nickname: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        return@withContext morseService
+            .signUp(SignUpParams(email, password, nickname))
+            .isSuccessful
     }
 
-    suspend fun login(email: String, password: String): Boolean {
-        withContext(Dispatchers.IO) {
-            val response = morseService.login(LoginParams(email, password))
-            saveTokens(response.data)
-            return@withContext true
-        }
-        return false
+    suspend fun login(email: String, password: String): Boolean = withContext(Dispatchers.IO) {
+        val response = morseService.login(LoginParams(email, password))
+        saveTokens(response.data)
+        return@withContext true
     }
 
     private suspend fun saveTokens(loginResponse: LoginResponse) = withContext(Dispatchers.IO) {
@@ -74,20 +66,24 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    suspend fun refreshTokens(refreshToken: String): LoginResponse? {
-        withContext(Dispatchers.IO) {
-            val response = morseService.refreshToken(refreshToken)
-            saveTokens(response.data)
-            return@withContext response
-        }
-        return null
+    suspend fun isSavedTokenValid(): Boolean = withContext(Dispatchers.IO) {
+        val savedToken = getAccessToken() ?: return@withContext false
+        morseService.checkValidToken(savedToken)
+        return@withContext true
+    }
+
+    suspend fun refreshTokens(): LoginResponse? = withContext(Dispatchers.IO) {
+        val refreshToken = getRefreshToken() ?: return@withContext null
+        val response = morseService.refreshToken(refreshToken)
+        saveTokens(response.data)
+        return@withContext response.data
     }
 
     suspend fun getAccessToken(): String? {
         return dataStore[KEY_ACCESS_TOKEN].first()
     }
 
-    suspend fun getRefreshToken(): String? {
+    private suspend fun getRefreshToken(): String? {
         return dataStore[KEY_REFRESH_TOKEN].first()
     }
 

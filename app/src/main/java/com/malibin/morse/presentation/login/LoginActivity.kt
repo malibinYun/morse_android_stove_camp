@@ -31,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
                 is String -> showToast(it)
             }
         }
+        loginViewModel.autoLogin()
     }
 
     private fun initView(binding: ActivityLoginBinding) {
