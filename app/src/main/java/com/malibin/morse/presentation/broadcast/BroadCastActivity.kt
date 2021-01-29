@@ -2,12 +2,18 @@ package com.malibin.morse.presentation.broadcast
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.malibin.morse.R
+import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.databinding.ActivityBroadCastBinding
+import com.malibin.morse.presentation.chatting.ChatMessagesAdapter
+import com.malibin.morse.presentation.chatting.RandomColorGenerator
 import com.malibin.morse.presentation.utils.hideStatusBar
 import com.malibin.morse.presentation.utils.showToast
 import com.malibin.morse.rtc.WebRtcClientEvents
@@ -16,9 +22,11 @@ import org.webrtc.RendererCommon
 import org.webrtc.VideoSink
 
 @AndroidEntryPoint
-class BroadCastActivity : AppCompatActivity() {
+class BroadCastActivity : AppCompatActivity(), TextView.OnEditorActionListener {
     private var binding: ActivityBroadCastBinding? = null
     private val broadCastViewModel: BroadCastViewModel by viewModels()
+
+    private var roomIdx: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +46,15 @@ class BroadCastActivity : AppCompatActivity() {
         broadCastViewModel.rtcState.observe(this) {
             if (it == WebRtcClientEvents.State.CONNECTED) attachRenderer()
         }
+
+        val chatMessagesAdapter = ChatMessagesAdapter(RandomColorGenerator())
+        chatMessagesAdapter.chatMessageColor = ChatMessage.Color.WHITE
+
+        binding.listChatting.adapter = chatMessagesAdapter
+        binding.buttonSend.setOnClickListener { sendChatMessage() }
+        broadCastViewModel.chatMessages.observe(this) {
+            chatMessagesAdapter.submitList(it) { scrollBottomOfChatting() }
+        }
     }
 
     private fun hasNoCamera(): Boolean =
@@ -53,6 +70,7 @@ class BroadCastActivity : AppCompatActivity() {
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
             setEnableHardwareScaler(true)
         }
+        binding.textInput.setOnEditorActionListener(this)
     }
 
     override fun onRequestPermissionsResult(
@@ -101,6 +119,30 @@ class BroadCastActivity : AppCompatActivity() {
         return requireBinding().windowBroadcastSurface
     }
 
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_SEND) {
+            sendChatMessage()
+            return true
+        }
+        return false
+    }
+
+    private fun sendChatMessage() {
+        val inputView = requireBinding().textInput
+        val message = inputView.text.toString()
+        if (message.isBlank()) return
+        broadCastViewModel.sendChatMessage(message, roomIdx)
+        inputView.setText("")
+    }
+
+    private fun scrollBottomOfChatting() {
+        val listChatting = requireBinding().listChatting
+        if (!listChatting.canScrollVertically(SCROLL_DOWN)) {
+            val adapter = listChatting.adapter as? ChatMessagesAdapter ?: return
+            listChatting.scrollToPosition(adapter.getLastPosition())
+        }
+    }
+
     private fun requireBinding() = binding ?: error("activity not inflated yet")
 
     override fun onDestroy() {
@@ -113,10 +155,11 @@ class BroadCastActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val REQUEST_CODE_PERMISSIONS = 1000
+        private const val REQUEST_CODE_PERMISSIONS = 2000
         private const val CAMERA_PERMISSION = android.Manifest.permission.CAMERA
         private const val MIC_PERMISSION = android.Manifest.permission.RECORD_AUDIO
         private const val PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED
+        private const val SCROLL_DOWN = 1
 
         const val KEY_ROOM_TITLE = "KEY_ROOM_TITLE"
         const val KEY_ROOM_CONTENT = "KEY_ROOM_CONTENT"

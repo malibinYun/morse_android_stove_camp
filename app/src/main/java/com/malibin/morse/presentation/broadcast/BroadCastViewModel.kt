@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.malibin.morse.data.entity.ChatMessage
+import com.malibin.morse.data.repository.AuthRepository
+import com.malibin.morse.data.repository.ChatMessageRepository
 import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.websocket.ChatMessageReceiveClient
 import com.malibin.morse.rtc.StreamingMode
@@ -23,6 +25,8 @@ import org.webrtc.VideoSink
 class BroadCastViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context,
     val eglBase: EglBase,
+    private val chatMessageRepository: ChatMessageRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel(), ChatMessageReceiveClient.Callback {
 
     private lateinit var webRtcClient: WebRtcClient
@@ -33,6 +37,9 @@ class BroadCastViewModel @ViewModelInject constructor(
 
     private val _isMicActivated = MutableLiveData(true)
     val isMicActivated: LiveData<Boolean> = _isMicActivated
+
+    private val _chatMessages = MutableLiveData<List<ChatMessage>>()
+    val chatMessages: LiveData<List<ChatMessage>> = _chatMessages
 
     fun connect() {
         webRtcClient =
@@ -63,6 +70,18 @@ class BroadCastViewModel @ViewModelInject constructor(
         webRtcClient.toggleMic(!isMicActivated)
     }
 
+    fun sendChatMessage(message: String, roomIdx: Int) {
+        val chatMessage = ChatMessage(message, "말리빈")
+        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
+        currentChatMessages.add(chatMessage)
+        _chatMessages.value = currentChatMessages
+
+//        viewModelScope.launch {
+//            val token = authRepository.getAccessToken() ?: error("Token must not be null")
+//            chatMessageRepository.sendChatMessage(token, roomIdx, ChatMessage(message))
+//        }
+    }
+
     fun disconnect() {
         webRtcClient.close()
     }
@@ -78,7 +97,9 @@ class BroadCastViewModel @ViewModelInject constructor(
         }
 
         override fun onChatReceived(chatMessage: ChatMessage) {
-
+            val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
+            currentChatMessages.add(chatMessage)
+            _chatMessages.value = currentChatMessages
         }
     }
 }

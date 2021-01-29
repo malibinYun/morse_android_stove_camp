@@ -32,6 +32,7 @@
                 android:id="@+id/list_chatting"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:background="@drawable/chatting_gradient_horizontal"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toTopOf="@+id/text_input"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -47,7 +48,6 @@
                 android:ems="10"
                 android:imeOptions="actionSend"
                 android:inputType="textPersonName"
-                android:text="Name"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/button_send"
                 app:layout_constraintStart_toStartOf="parent" />
