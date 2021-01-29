@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.malibin.morse.databinding.ActivityLoginBinding
+import com.malibin.morse.presentation.rooms.RoomsActivity
 import com.malibin.morse.presentation.signup.SignUpActivity
 import com.malibin.morse.presentation.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,9 +24,7 @@ class LoginActivity : AppCompatActivity() {
 
         initView(binding)
 
-        loginViewModel.isSuccess.observe(this) {
-            Toast.makeText(this, "로그인굳드", Toast.LENGTH_SHORT).show()
-        }
+        loginViewModel.isSuccess.observe(this) { deployRoomsActivity() }
         loginViewModel.toastMessage.observe(this) {
             when (it) {
                 is Int -> showToast(it)
@@ -43,5 +42,11 @@ class LoginActivity : AppCompatActivity() {
     private fun deploySignUpActivity() {
         val intent = Intent(this, SignUpActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun deployRoomsActivity() {
+        val intent = Intent(this, RoomsActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

@@ -24,17 +24,19 @@
 
         </activity>
         <activity android:name=".presentation.viewer.ViewerActivity">
+
+        </activity>
+        <activity
+            android:name=".presentation.broadcast.BroadCastActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".presentation.signup.SignUpActivity" />
+        <activity android:name=".presentation.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".presentation.broadcast.BroadCastActivity"
-            android:screenOrientation="landscape" />
-        <activity android:name=".presentation.signup.SignUpActivity" />
-        <activity android:name=".presentation.login.LoginActivity" />
     </application>
 
 </manifest>

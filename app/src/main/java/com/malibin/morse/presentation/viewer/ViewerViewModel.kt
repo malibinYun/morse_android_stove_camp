@@ -5,12 +5,15 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.malibin.morse.data.entity.ChatMessage
-import com.malibin.morse.presentation.utils.printLog
+import com.malibin.morse.data.repository.AuthRepository
+import com.malibin.morse.data.repository.ChatMessageRepository
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
 import com.malibin.morse.rtc.WebRtcClientEvents
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
 import org.webrtc.EglBase
 import org.webrtc.VideoSink
 
@@ -22,6 +25,8 @@ import org.webrtc.VideoSink
 class ViewerViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context,
     val eglBase: EglBase,
+    private val chatMessageRepository: ChatMessageRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private lateinit var webRtcClient: WebRtcClient
@@ -53,13 +58,16 @@ class ViewerViewModel @ViewModelInject constructor(
         webRtcClient.detachVideoRenderer(renderer)
     }
 
-    fun sendChatMessage(message: String) {
-        //TODO http로 보내야함
-        // TODO 닉네임 가져오는 로직잇어야함
+    fun sendChatMessage(message: String, roomIdx: Int) {
         val chatMessage = ChatMessage(message, "말리빈")
         val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
         currentChatMessages.add(chatMessage)
         _chatMessages.value = currentChatMessages
+
+//        viewModelScope.launch {
+//            val token = authRepository.getAccessToken() ?: error("Token must not be null")
+//            chatMessageRepository.sendChatMessage(token, roomIdx, ChatMessage(message))
+//        }
     }
 
     override fun onCleared() {

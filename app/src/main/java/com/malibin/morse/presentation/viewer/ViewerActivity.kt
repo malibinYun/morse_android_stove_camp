@@ -32,6 +32,8 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
 
     private val viewerViewModel: ViewerViewModel by viewModels()
 
+    private val room: Room by lazy { intent.getSerializableExtra(KEY_ROOM) as Room }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -93,7 +95,7 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
             ?: error("cannot find textInput View")
         val message = inputView.text.toString()
         if (message.isBlank()) return
-        viewerViewModel.sendChatMessage(message)
+        viewerViewModel.sendChatMessage(message, room.id)
         inputView.setText("")
     }
 
@@ -113,8 +115,6 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
             listChatting.scrollToPosition(chatMessagesAdapter?.getLastPosition() ?: return)
         }
     }
-
-    private fun getRoom(): Room = intent.getSerializableExtra(KEY_ROOM) as Room
 
     override fun onResume() {
         super.onResume()
@@ -137,7 +137,7 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
 
     private fun onBroadCastAlreadyClosed() {
         showToast(R.string.broadcast_already_closed)
-        val intent = Intent().apply { putExtra(KEY_ROOM, getRoom()) }
+        val intent = Intent().apply { putExtra(KEY_ROOM, room) }
         setResult(RESULT_ALREADY_CLOSED, intent)
         finish()
     }
@@ -149,7 +149,7 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
 
     override fun onStop() {
         super.onStop()
-//        detachCurrentRenderer()
+        detachCurrentRenderer()
     }
 
     override fun onDestroy() {

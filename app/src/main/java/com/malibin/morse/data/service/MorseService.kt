@@ -7,6 +7,7 @@ import com.malibin.morse.data.service.params.CheckEmailParams
 import com.malibin.morse.data.service.params.VerifyEmailParams
 import com.malibin.morse.data.service.params.CheckNicknameParams
 import com.malibin.morse.data.service.params.LoginParams
+import com.malibin.morse.data.service.params.SendChatMessageParams
 import com.malibin.morse.data.service.params.SignUpParams
 import com.malibin.morse.data.service.response.BaseResponse
 import com.malibin.morse.data.service.response.LoginResponse
@@ -76,6 +77,12 @@ interface MorseService {
 
     @POST("live/search-all")
     suspend fun getAllRooms(): BaseResponse<List<Room>>
+
+    @POST("chat/send/message")
+    suspend fun sendChatMessage(
+        @Header("token") token: String,
+        @Body params: SendChatMessageParams,
+    )
 
     companion object {
         const val BASE_URL = "http://downsups.onstove.com:8005"
