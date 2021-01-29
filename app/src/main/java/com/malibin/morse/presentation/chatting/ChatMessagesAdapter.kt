@@ -72,11 +72,12 @@ class ChatMessagesAdapter(
                 ChatMessage.Color.BLACK -> Color.BLACK
                 ChatMessage.Color.WHITE -> Color.WHITE
             }
-            val messageSpan = SpannableString(" : ${chatMessage.message}".replace(" ", "\u00A0"))
+            val messageWithColon = " : ${chatMessage.message}"
+            val messageSpan = SpannableString(messageWithColon.replace(" ", "\u00A0"))
             messageSpan.setSpan(
                 ForegroundColorSpan(messageColor),
                 0,
-                chatMessage.userNickname.length,
+                messageWithColon.length,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             return TextUtils.concat(nicknameSpan, messageSpan)

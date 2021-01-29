@@ -2,6 +2,9 @@ package com.malibin.morse.presentation.viewer
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.malibin.morse.R
@@ -13,6 +16,7 @@ import com.malibin.morse.presentation.chatting.ChatMessagesAdapter
 import com.malibin.morse.presentation.chatting.RandomColorGenerator
 import com.malibin.morse.presentation.utils.hideStatusBar
 import com.malibin.morse.presentation.utils.isPortraitOrientation
+import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.presentation.utils.showToast
 import com.malibin.morse.rtc.WebRtcClientEvents
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +24,7 @@ import org.webrtc.RendererCommon
 import org.webrtc.VideoSink
 
 @AndroidEntryPoint
-class ViewerActivity : AppCompatActivity() {
+class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
 
     private var landscapeBinding: ActivityViewerLandscapeBinding? = null
     private var portraitBinding: ActivityViewerPortraitBinding? = null
@@ -61,6 +65,11 @@ class ViewerActivity : AppCompatActivity() {
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
             setEnableHardwareScaler(true)
         }
+        chatMessagesAdapter?.chatMessageColor = ChatMessage.Color.WHITE
+        binding.listChatting.adapter = chatMessagesAdapter
+        binding.listChatting.itemAnimator = null
+        binding.buttonSend.setOnClickListener { sendChatMessage() }
+        binding.textInput.setOnEditorActionListener(this)
     }
 
     private fun initView(binding: ActivityViewerPortraitBinding) {
@@ -71,17 +80,34 @@ class ViewerActivity : AppCompatActivity() {
             setEnableHardwareScaler(true)
             setMirror(true)
         }
+        chatMessagesAdapter?.chatMessageColor = ChatMessage.Color.BLACK
         binding.listChatting.adapter = chatMessagesAdapter
         binding.listChatting.itemAnimator = null
-        binding.buttonSend.setOnClickListener {
-            viewerViewModel.sendChatMessage(binding.textInput.text.toString())
-            binding.textInput.setText("")
+        binding.buttonSend.setOnClickListener { sendChatMessage() }
+        binding.textInput.setOnEditorActionListener(this)
+    }
+
+    private fun sendChatMessage() {
+        val inputView = portraitBinding?.textInput
+            ?: landscapeBinding?.textInput
+            ?: error("cannot find textInput View")
+        val message = inputView.text.toString()
+        if (message.isBlank()) return
+        viewerViewModel.sendChatMessage(message)
+        inputView.setText("")
+    }
+
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_SEND) {
+            sendChatMessage()
+            return true
         }
+        return false
     }
 
     private fun scrollBottomOfChatting() {
         val listChatting = portraitBinding?.listChatting
-//            ?: landscapeBinding?.listChatting
+            ?: landscapeBinding?.listChatting
             ?: error("cannot find recyclerView")
         if (!listChatting.canScrollVertically(SCROLL_DOWN)) {
             listChatting.scrollToPosition(chatMessagesAdapter?.getLastPosition() ?: return)
@@ -123,7 +149,7 @@ class ViewerActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        detachCurrentRenderer()
+//        detachCurrentRenderer()
     }
 
     override fun onDestroy() {

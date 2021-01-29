@@ -40,8 +40,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:ems="10"
-            android:inputType="textMultiLine|textPersonName"
+            android:inputType="textPersonName"
             android:maxLines="4"
+            android:imeOptions="actionSend"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/button_send"
             app:layout_constraintStart_toStartOf="parent" />
