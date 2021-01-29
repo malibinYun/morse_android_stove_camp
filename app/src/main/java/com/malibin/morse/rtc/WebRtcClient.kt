@@ -2,6 +2,7 @@ package com.malibin.morse.rtc
 
 import android.content.Context
 import com.malibin.morse.R
+import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
@@ -220,6 +221,8 @@ class WebRtcClient(
                     val byteArray = ByteArray(buffer?.data?.capacity() ?: return)
                     buffer.data.get(byteArray)
                     printLog("DataChannel onMessage : $byteArray")
+
+                    webRtcClientEvents.onChatReceived(ChatMessage("됨ㅋ", "호롤리"))
                 }
 
                 override fun onBufferedAmountChange(previousAmount: Long) {

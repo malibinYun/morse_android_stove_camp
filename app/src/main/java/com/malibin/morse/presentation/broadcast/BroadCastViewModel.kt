@@ -5,6 +5,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.websocket.ChatMessageReceiveClient
 import com.malibin.morse.rtc.StreamingMode
@@ -74,6 +75,10 @@ class BroadCastViewModel @ViewModelInject constructor(
     private inner class WebRtcClientEventsImpl : WebRtcClientEvents {
         override fun onStateChanged(state: WebRtcClientEvents.State) {
             _rtcState.postValue(state)
+        }
+
+        override fun onChatReceived(chatMessage: ChatMessage) {
+
         }
     }
 }

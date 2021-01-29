@@ -80,5 +80,11 @@ class ViewerViewModel @ViewModelInject constructor(
         override fun onStateChanged(state: WebRtcClientEvents.State) {
             _rtcState.postValue(state)
         }
+
+        override fun onChatReceived(chatMessage: ChatMessage) {
+            val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
+            currentChatMessages.add(chatMessage)
+            _chatMessages.value = currentChatMessages
+        }
     }
 }
