@@ -2,6 +2,7 @@ package com.malibin.morse.rtc
 
 import android.content.Context
 import com.malibin.morse.R
+import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
 import org.java_websocket.handshake.ServerHandshake
@@ -85,6 +86,10 @@ class WebRtcClient(
         StreamingMode.VIEWER -> {
             peerConnectionClient.detachRenderer(streamingMode, renderer)
         }
+    }
+
+    fun sendChatMessage(chatMessageResponse: ChatMessageResponse) {
+        peerConnectionClient.sendChatMessage(chatMessageResponse)
     }
 
     fun switchCamera() {

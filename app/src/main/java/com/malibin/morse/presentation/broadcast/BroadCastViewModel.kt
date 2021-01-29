@@ -5,6 +5,8 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.malibin.morse.data.service.response.ChatMessageResponse
+import com.malibin.morse.data.websocket.ChatMessageReceiveClient
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
 import com.malibin.morse.rtc.WebRtcClientEvents
@@ -20,9 +22,10 @@ import org.webrtc.VideoSink
 class BroadCastViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context,
     val eglBase: EglBase,
-) : ViewModel() {
+) : ViewModel(), ChatMessageReceiveClient.Callback {
 
     private lateinit var webRtcClient: WebRtcClient
+    private lateinit var chatMessageReceiveClient: ChatMessageReceiveClient
 
     private val _rtcState = MutableLiveData(WebRtcClientEvents.State.INITIAL)
     val rtcState: LiveData<WebRtcClientEvents.State> = _rtcState
@@ -34,6 +37,11 @@ class BroadCastViewModel @ViewModelInject constructor(
         webRtcClient =
             WebRtcClient(context, eglBase, StreamingMode.BROADCAST, WebRtcClientEventsImpl())
         webRtcClient.connectPeer()
+        chatMessageReceiveClient = ChatMessageReceiveClient(1, this)
+    }
+
+    override fun onMessage(response: ChatMessageResponse) {
+        webRtcClient.sendChatMessage(response)
     }
 
     fun attachRenderer(renderer: VideoSink) {

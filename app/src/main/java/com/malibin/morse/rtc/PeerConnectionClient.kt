@@ -1,5 +1,7 @@
 package com.malibin.morse.rtc
 
+import com.google.gson.Gson
+import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.presentation.utils.printLog
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -13,6 +15,7 @@ import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 import org.webrtc.VideoSink
 import org.webrtc.VideoTrack
+import java.nio.ByteBuffer
 
 /**
  * Created By Malibin
@@ -113,6 +116,12 @@ class PeerConnectionClient(
         return peerConnection.transceivers
             .map { it.receiver.track() }
             .find { it is VideoTrack } as? VideoTrack ?: error("cannot find receive video track")
+    }
+
+    fun sendChatMessage(chatMessageResponse: ChatMessageResponse) {
+        val jsonString: String = Gson().toJson(chatMessageResponse)
+        val buffer = DataChannel.Buffer(ByteBuffer.wrap(jsonString.toByteArray()), false)
+        dataChannel.send(buffer)
     }
 
     fun close() {
