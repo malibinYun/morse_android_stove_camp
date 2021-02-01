@@ -88,7 +88,7 @@ class BroadCastActivity : AppCompatActivity(), TextView.OnEditorActionListener {
     }
 
     private fun startBroadCast() {
-        broadCastViewModel.connect()
+        broadCastViewModel.createBroadcastRoom(getRoomTitle(), getRoomContent())
     }
 
     private fun showPermissionRejected() {
@@ -142,6 +142,12 @@ class BroadCastActivity : AppCompatActivity(), TextView.OnEditorActionListener {
             listChatting.scrollToPosition(adapter.getLastPosition())
         }
     }
+
+    private fun getRoomTitle(): String = intent.getStringExtra(KEY_ROOM_TITLE)
+        ?: error("room title cannot be null")
+
+    private fun getRoomContent(): String = intent.getStringExtra(KEY_ROOM_CONTENT)
+        ?: error("room content cannot be null")
 
     private fun requireBinding() = binding ?: error("activity not inflated yet")
 

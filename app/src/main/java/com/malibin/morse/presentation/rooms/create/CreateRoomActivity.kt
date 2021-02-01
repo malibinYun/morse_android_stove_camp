@@ -15,8 +15,8 @@ class CreateRoomActivity : AppCompatActivity() {
 
         binding.buttonCreateRoom.setOnClickListener {
             it.isEnabled = false
-            val roomTitle = binding.textRoomTitle.text
-            val roomContent = binding.textRoomContent.text
+            val roomTitle = binding.textRoomTitle.text.toString()
+            val roomContent = binding.textRoomContent.text.toString()
             val intent = Intent(this, BroadCastActivity::class.java).apply {
                 putExtra(BroadCastActivity.KEY_ROOM_TITLE, roomTitle)
                 putExtra(BroadCastActivity.KEY_ROOM_CONTENT, roomContent)

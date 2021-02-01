@@ -1,5 +1,6 @@
 package com.malibin.morse.rtc
 
+import com.malibin.morse.data.service.params.RequestRoomParams
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 
@@ -10,7 +11,7 @@ import org.webrtc.SessionDescription
 
 interface RtcClient {
 
-    fun connectRoom()
+    fun connectRoom(params: RequestRoomParams)
 
     fun sendOfferSessionDescription(
         sessionDescription: SessionDescription,
@@ -19,7 +20,10 @@ interface RtcClient {
 
     fun sendAnswerSessionDescription(sessionDescription: SessionDescription)
 
-    fun sendLocalIceCandidate(iceCandidate: IceCandidate)
+    fun sendLocalIceCandidate(
+        iceCandidate: IceCandidate,
+        streamingMode: StreamingMode
+    )
 
     fun sendLocalIceCandidateRemovals(iceCandidates: Array<IceCandidate?>)
 }

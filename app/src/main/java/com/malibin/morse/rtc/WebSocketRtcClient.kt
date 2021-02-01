@@ -1,14 +1,9 @@
 package com.malibin.morse.rtc
 
 import com.google.gson.Gson
+import com.malibin.morse.data.service.params.RequestRoomParams
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import okhttp3.internal.connection.RouteSelector.Companion.socketHost
 import org.java_websocket.WebSocket
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.framing.Framedata
@@ -33,6 +28,8 @@ class WebSocketRtcClient(
 ) : WebSocketClient(HOST_URI), RtcClient {
 
     private val gson: Gson = Gson()
+
+    private lateinit var params: RequestRoomParams
 
     fun setTrustedCertificate(certificateInputStream: InputStream?) {
         if (isOpen) error("cannot set certificate when socket opened")
@@ -83,7 +80,8 @@ class WebSocketRtcClient(
         callback.onError(ex)
     }
 
-    override fun connectRoom() {
+    override fun connectRoom(params: RequestRoomParams) {
+        this.params = params
         connect()
     }
 
@@ -93,7 +91,17 @@ class WebSocketRtcClient(
     ) {
         val json = JSONObject().apply {
             put("id", streamingMode.id)
+            put("token", params.token)
             put("sdpOffer", sessionDescription.description)
+        }
+        when (streamingMode) {
+            StreamingMode.BROADCAST -> {
+                json.put("title", params.title)
+                json.put("content", params.content)
+            }
+            StreamingMode.VIEWER -> {
+                json.put("presenterIdx", params.roomId)
+            }
         }
         send(json.toString())
     }
@@ -102,10 +110,15 @@ class WebSocketRtcClient(
         printLog("sendAnswerSessionDescription : $sessionDescription")
     }
 
-    override fun sendLocalIceCandidate(iceCandidate: IceCandidate) {
+    override fun sendLocalIceCandidate(
+        iceCandidate: IceCandidate,
+        streamingMode: StreamingMode
+    ) {
         val json = JSONObject().apply {
             put("id", "onIceCandidate")
             put("candidate", iceCandidate.toJson())
+            put("token", params.token)
+            put("isPresenter", streamingMode == StreamingMode.BROADCAST)
         }
         send(json.toString())
     }
@@ -124,10 +137,9 @@ class WebSocketRtcClient(
         super.onWebsocketPing(conn, f)
         printLog("onWebsocket Ping ${f?.opcode}")
         printLog("onWebsocket Ping ${String(f?.payloadData?.array() ?: ByteArray(0))}")
-
     }
 
     companion object {
-        private val HOST_URI = URI("wss://goto.downsups.kro.kr/call")
+        private val HOST_URI = URI("wss://downsups.onstove.com:8443/call")
     }
 }

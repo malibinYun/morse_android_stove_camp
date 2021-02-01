@@ -9,11 +9,13 @@ import androidx.lifecycle.viewModelScope
 import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.data.repository.AuthRepository
 import com.malibin.morse.data.repository.ChatMessageRepository
+import com.malibin.morse.data.service.params.RequestRoomParams
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
 import com.malibin.morse.rtc.WebRtcClientEvents
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.webrtc.EglBase
 import org.webrtc.VideoSink
 
@@ -39,12 +41,17 @@ class ViewerViewModel @ViewModelInject constructor(
 
     private var isInitial: Boolean = true
 
-    fun connect() {
+    fun connect(roomIdx: Int) {
         if (isInitial) {
             isInitial = false
+            val params = RequestRoomParams(
+                token = runBlocking { authRepository.getAccessToken() }
+                    ?: error("token cannot be null"),
+                roomId = roomIdx,
+            )
             webRtcClient =
                 WebRtcClient(context, eglBase, StreamingMode.VIEWER, WebRtcClientEventsImpl())
-            webRtcClient.connectPeer()
+            webRtcClient.connectPeer(params)
         }
     }
 

@@ -8,12 +8,14 @@ import androidx.lifecycle.ViewModel
 import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.data.repository.AuthRepository
 import com.malibin.morse.data.repository.ChatMessageRepository
+import com.malibin.morse.data.service.params.RequestRoomParams
 import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.websocket.ChatMessageReceiveClient
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
 import com.malibin.morse.rtc.WebRtcClientEvents
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.runBlocking
 import org.webrtc.EglBase
 import org.webrtc.VideoSink
 
@@ -41,10 +43,16 @@ class BroadCastViewModel @ViewModelInject constructor(
     private val _chatMessages = MutableLiveData<List<ChatMessage>>()
     val chatMessages: LiveData<List<ChatMessage>> = _chatMessages
 
-    fun connect() {
+    fun createBroadcastRoom(roomTitle: String, roomContent: String) {
+        val params = RequestRoomParams(
+            token = runBlocking { authRepository.getAccessToken() }
+                ?: error("token cannot be null"),
+            title = roomTitle,
+            content = roomContent,
+        )
         webRtcClient =
             WebRtcClient(context, eglBase, StreamingMode.BROADCAST, WebRtcClientEventsImpl())
-        webRtcClient.connectPeer()
+        webRtcClient.connectPeer(params)
         chatMessageReceiveClient = ChatMessageReceiveClient(1, this)
     }
 

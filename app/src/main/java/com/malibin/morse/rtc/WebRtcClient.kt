@@ -3,6 +3,7 @@ package com.malibin.morse.rtc
 import android.content.Context
 import com.malibin.morse.R
 import com.malibin.morse.data.entity.ChatMessage
+import com.malibin.morse.data.service.params.RequestRoomParams
 import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
@@ -60,15 +61,15 @@ class WebRtcClient(
         }
     }
 
-    fun connectPeer() {
+    fun connectPeer(params: RequestRoomParams) {
         if (streamingMode == StreamingMode.BROADCAST) {
             peerConnectionClient.addTracks(
                 mediaTrackManager.audioTrack,
                 mediaTrackManager.videoTrack
             )
         }
-        webSocketRtcClient.setTrustedCertificate(context.resources.openRawResource(R.raw.kurento_example_certification))
-        webSocketRtcClient.connectRoom()
+        webSocketRtcClient.setTrustedCertificate(context.resources.openRawResource(R.raw.onstove_certicatie))
+        webSocketRtcClient.connectRoom(params)
     }
 
     fun attachVideoRenderer(renderer: VideoSink) = when (streamingMode) {
@@ -193,7 +194,7 @@ class WebRtcClient(
 
         override fun onIceCandidate(iceCandidate: IceCandidate) {
             printLog("onIceCandidate // iceCandidate : $iceCandidate")
-            webSocketRtcClient.sendLocalIceCandidate(iceCandidate)
+            webSocketRtcClient.sendLocalIceCandidate(iceCandidate, streamingMode)
         }
 
         override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate?>) {
