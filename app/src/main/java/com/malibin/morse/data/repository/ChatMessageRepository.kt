@@ -14,10 +14,10 @@ import javax.inject.Inject
 class ChatMessageRepository @Inject constructor(
     private val morseService: MorseService,
 ) {
-    suspend fun sendChatMessage(token: String, roomIdx: Int, chatMessage: ChatMessage) {
+    suspend fun sendChatMessage(roomIdx: Int, chatMessage: ChatMessage) {
         withContext(Dispatchers.IO) {
             val params = chatMessage.toSendChatMessageParams(roomIdx)
-            morseService.sendChatMessage(token, params)
+            morseService.sendChatMessage(params)
         }
     }
 }

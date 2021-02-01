@@ -1,10 +1,5 @@
 package com.malibin.morse.data.repository
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
-import com.malibin.morse.data.get
 import com.malibin.morse.data.service.MorseService
 import com.malibin.morse.data.service.params.CheckEmailParams
 import com.malibin.morse.data.service.params.CheckNicknameParams
@@ -12,8 +7,8 @@ import com.malibin.morse.data.service.params.LoginParams
 import com.malibin.morse.data.service.params.SignUpParams
 import com.malibin.morse.data.service.params.VerifyEmailParams
 import com.malibin.morse.data.service.response.LoginResponse
+import com.malibin.morse.data.source.AuthLocalDataSource
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -24,7 +19,7 @@ import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
     private val morseService: MorseService,
-    private val dataStore: DataStore<Preferences>
+    private val localDataSource: AuthLocalDataSource,
 ) {
     suspend fun checkNickname(nickname: String): Boolean = withContext(Dispatchers.IO) {
         return@withContext morseService.checkNickname(CheckNicknameParams(nickname)).isSuccessful
@@ -55,19 +50,12 @@ class AuthRepository @Inject constructor(
 
     suspend fun login(email: String, password: String): Boolean = withContext(Dispatchers.IO) {
         val response = morseService.login(LoginParams(email, password))
-        saveTokens(response.data)
+        localDataSource.saveTokens(response.data.accessToken, response.data.refreshToken)
         return@withContext true
     }
 
-    private suspend fun saveTokens(loginResponse: LoginResponse) = withContext(Dispatchers.IO) {
-        dataStore.edit {
-            it[KEY_ACCESS_TOKEN] = loginResponse.accessToken
-            it[KEY_REFRESH_TOKEN] = loginResponse.refreshToken
-        }
-    }
-
     suspend fun isSavedTokenValid(): Boolean = withContext(Dispatchers.IO) {
-        val savedToken = getAccessToken() ?: return@withContext false
+        val savedToken = localDataSource.getAccessToken() ?: return@withContext false
         morseService.checkValidToken(savedToken)
         return@withContext true
     }
@@ -75,20 +63,16 @@ class AuthRepository @Inject constructor(
     suspend fun refreshTokens(): LoginResponse? = withContext(Dispatchers.IO) {
         val refreshToken = getRefreshToken() ?: return@withContext null
         val response = morseService.refreshToken(refreshToken)
-        saveTokens(response.data)
+        localDataSource.saveTokens(response.data.accessToken, response.data.refreshToken)
         return@withContext response.data
     }
 
     suspend fun getAccessToken(): String? {
-        return dataStore[KEY_ACCESS_TOKEN].first()
+//        return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtb21lQG5hdmVyLmNvbSIsIm5pY2tuYW1lIjoi66qo66mUIiwiZXhwIjoxNjExOTIyMzE3LCJpYXQiOjE2MTE5MTg3MTd9.fjQ3qWuBff6dm-oJA-jwQ1CSC8-8Bv2DU9JJFzLT8Lg"
+        return localDataSource.getAccessToken()
     }
 
-    private suspend fun getRefreshToken(): String? {
-        return dataStore[KEY_REFRESH_TOKEN].first()
-    }
-
-    companion object {
-        private val KEY_ACCESS_TOKEN = preferencesKey<String>("KEY_ACCESS_TOKEN")
-        private val KEY_REFRESH_TOKEN = preferencesKey<String>("KEY_REFRESH_TOKEN")
+    suspend fun getRefreshToken(): String? {
+        return localDataSource.getRefreshToken()
     }
 }

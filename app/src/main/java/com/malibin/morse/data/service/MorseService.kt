@@ -72,13 +72,11 @@ interface MorseService {
 
     @POST("auth/change/nickname")
     suspend fun changeNickname(
-        @Header("token") token: String,
         @Body params: ChangeNicknameParams,
     ): Response<Unit>
 
     @GET("auth/withdraw")
     suspend fun deleteAccount(
-        @Header("token") token: String,
     ): Response<Unit>
 
     @POST("live/search-all")
@@ -86,7 +84,6 @@ interface MorseService {
 
     @POST("chat/send/message")
     suspend fun sendChatMessage(
-        @Header("token") token: String,
         @Body params: SendChatMessageParams,
     ): Response<Unit>
 
