@@ -19,8 +19,9 @@ class AuthLocalDataSource @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) {
     suspend fun getAccessToken(): String? = withContext(Dispatchers.IO) {
-        return@withContext "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtb21lQG5hdmVyLmNvbSIsIm5pY2tuYW1lIjoi66qo66mUIiwiZXhwIjoxNjExOTIyMzE3LCJpYXQiOjE2MTE5MTg3MTd9.fjQ3qWuBff6dm-oJA-jwQ1CSC8-8Bv2DU9JJFzLT8Lg"
-//        return@withContext dataStore[KEY_ACCESS_TOKEN].first()
+        // 만료 토큰
+//        return@withContext "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtb21lQG5hdmVyLmNvbSIsIm5pY2tuYW1lIjoi66qo66mUIiwiZXhwIjoxNjExOTIyMzE3LCJpYXQiOjE2MTE5MTg3MTd9.fjQ3qWuBff6dm-oJA-jwQ1CSC8-8Bv2DU9JJFzLT8Lg"
+        return@withContext dataStore[KEY_ACCESS_TOKEN].first()
     }
 
     suspend fun getRefreshToken(): String? = withContext(Dispatchers.IO) {

@@ -8,6 +8,7 @@ import com.malibin.morse.data.service.params.SignUpParams
 import com.malibin.morse.data.service.params.VerifyEmailParams
 import com.malibin.morse.data.service.response.LoginResponse
 import com.malibin.morse.data.source.AuthLocalDataSource
+import com.malibin.morse.presentation.utils.printLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -56,8 +57,7 @@ class AuthRepository @Inject constructor(
 
     suspend fun isSavedTokenValid(): Boolean = withContext(Dispatchers.IO) {
         val savedToken = localDataSource.getAccessToken() ?: return@withContext false
-        morseService.checkValidToken(savedToken)
-        return@withContext true
+        return@withContext morseService.checkValidToken(savedToken).isSuccessful
     }
 
     suspend fun refreshTokens(): LoginResponse? = withContext(Dispatchers.IO) {
@@ -68,11 +68,10 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun getAccessToken(): String? {
-//        return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtb21lQG5hdmVyLmNvbSIsIm5pY2tuYW1lIjoi66qo66mUIiwiZXhwIjoxNjExOTIyMzE3LCJpYXQiOjE2MTE5MTg3MTd9.fjQ3qWuBff6dm-oJA-jwQ1CSC8-8Bv2DU9JJFzLT8Lg"
         return localDataSource.getAccessToken()
     }
 
     suspend fun getRefreshToken(): String? {
-        return localDataSource.getRefreshToken()
+        return localDataSource.getRefreshToken().also { printLog("refresh : $it") }
     }
 }

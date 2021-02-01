@@ -26,7 +26,7 @@ class LoginViewModel @ViewModelInject constructor(
     val isSuccess = SingleLiveEvent<Any>()
     val toastMessage = SingleLiveEvent<Any>()
 
-    fun autoLogin() = viewModelScope.launch {
+    fun autoLogin() = viewModelScope.launch(handleLoginFail()) {
         isLoading.value = true
         if (authRepository.isSavedTokenValid()) {
             isLoading.value = false

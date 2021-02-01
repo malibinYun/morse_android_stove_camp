@@ -10,6 +10,7 @@ import dagger.hilt.android.components.ApplicationComponent
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import retrofit2.Retrofit
@@ -56,9 +57,17 @@ object RetrofitModule {
         authLocalDataSource: AuthLocalDataSource
     ) = Interceptor {
         val requestWithHeader = it.request().newBuilder()
-        runBlocking { authLocalDataSource.getAccessToken() }
-            ?.run { requestWithHeader.addHeader("token", this) }
+        val accessToken = runBlocking { authLocalDataSource.getAccessToken() }
+        if (accessToken != null && !isTokenFilteredRequest(it.request())) {
+            requestWithHeader.addHeader("token", accessToken)
+        }
         return@Interceptor it.proceed(requestWithHeader.build())
+    }
+
+    private fun isTokenFilteredRequest(request: Request): Boolean = when {
+        request.url.encodedPath == "/auth/login" -> true
+        request.header("RefreshToken") != null -> true
+        else -> false
     }
 
     private fun printLog(message: String) {
