@@ -128,7 +128,7 @@ class WebRtcClient(
         }
 
         override fun onMessage(response: SocketResponse?) {
-            printLog("onMessage Called // response : $response")
+//            printLog("onMessage Called // response : $response")
             if (response == null) return
 
             when (response.responseId) {
@@ -139,6 +139,7 @@ class WebRtcClient(
                     }
                     val sdp = SessionDescription(SessionDescription.Type.ANSWER, response.sdpAnswer)
                     peerConnectionClient.setRemoteDescription(sdp)
+                    webRtcClientEvents.onCreateBroadCastRoomId(response.roomIdx ?: return)
                 }
                 SocketResponse.ID.ICE_CANDIDATE -> {
                     val candidateResponse = response.candidate ?: error("candidate cannot be null")

@@ -4,6 +4,12 @@ import com.google.gson.Gson
 import com.malibin.morse.data.service.params.RequestRoomParams
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.java_websocket.WebSocket
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.framing.Framedata
@@ -55,19 +61,20 @@ class WebSocketRtcClient(
     override fun onOpen(handshakedata: ServerHandshake?) {
         callback.onOpen(handshakedata)
 
-//        CoroutineScope(Dispatchers.IO).launch {
-//            var count = 0
-//            while (count < 20) {
-//                sendPing()
-//                printLog("ping send")
-//                count++
-//                delay(1_000)
-//            }
+        CoroutineScope(Dispatchers.IO).launch {
+            var count = 0
+            while (isActive) {
+                sendPing()
+                printLog("ping send")
+                count++
+                delay(1_000)
+            }
 //            this.cancel()
-//        }
+        }
     }
 
     override fun onMessage(message: String?) {
+        printLog("socket raw onMessage : $message")
         val response = gson.fromJson(message, SocketResponse::class.java)
         callback.onMessage(response)
     }
@@ -97,7 +104,7 @@ class WebSocketRtcClient(
         when (streamingMode) {
             StreamingMode.BROADCAST -> {
                 json.put("title", params.title)
-                json.put("content", params.content)
+                json.put("contents", params.content)
             }
             StreamingMode.VIEWER -> {
                 json.put("presenterIdx", params.roomId)

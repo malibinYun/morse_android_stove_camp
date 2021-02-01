@@ -12,6 +12,9 @@ interface WebRtcClientEvents {
 
     fun onChatReceived(chatMessage: ChatMessage)
 
+    open fun onCreateBroadCastRoomId(roomId: Int) {
+    }
+
     enum class State {
         INITIAL,
         CONNECTED,

@@ -12,6 +12,7 @@ import com.malibin.morse.data.entity.Room
 import com.malibin.morse.databinding.ActivityRoomsBinding
 import com.malibin.morse.databinding.ItemRoomBinding
 import com.malibin.morse.presentation.rooms.create.CreateRoomActivity
+import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.presentation.viewer.ViewerActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,6 +39,7 @@ class RoomsActivity : AppCompatActivity() {
         binding.buttonMypage.setOnClickListener { }
         binding.windowSwipeRefresh.setOnRefreshListener { roomsViewModel.loadAllRooms() }
         roomsViewModel.rooms.observe(this) {
+            printLog(it)
             adapter.submitList(it)
             binding.windowSwipeRefresh.isRefreshing = false
         }

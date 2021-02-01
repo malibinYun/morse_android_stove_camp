@@ -79,7 +79,7 @@ interface MorseService {
     suspend fun deleteAccount(
     ): Response<Unit>
 
-    @POST("live/search-all")
+    @POST("room/live/search-all")
     suspend fun getAllRooms(): BaseResponse<List<Room>>
 
     @POST("chat/send/message")

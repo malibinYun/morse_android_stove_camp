@@ -13,6 +13,7 @@ data class SocketResponse(
     val message: String,
     val success: Boolean,
     val from: String?,
+    val roomIdx: Int?,
 ) {
     val responseId: ID
         get() = ID.findBy(id)
