@@ -14,6 +14,7 @@ data class SocketResponse(
     val success: Boolean,
     val from: String?,
     val roomIdx: Int?,
+    val data: ViewerSocketResponse?,
 ) {
     val responseId: ID
         get() = ID.findBy(id)

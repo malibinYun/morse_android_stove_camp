@@ -24,6 +24,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="240dp"
             android:layout_height="match_parent"
+            android:background="@drawable/chatting_gradient_horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -32,7 +33,6 @@
                 android:id="@+id/list_chatting"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="@drawable/chatting_gradient_horizontal"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toTopOf="@+id/text_input"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -46,8 +46,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:imeOptions="actionSend"
+                android:imeOptions="flagNoExtractUi|actionSend"
                 android:inputType="textPersonName"
+                android:textColor="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/button_send"
                 app:layout_constraintStart_toStartOf="parent" />
