@@ -92,7 +92,6 @@
             style="@style/TextButton"
             android:layout_width="251dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
             android:gravity="center"
             android:onClick="@{() -> viewModel.submitSignUp()}"
             android:paddingTop="16dp"
@@ -103,6 +102,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_password_check"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.3" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="@{viewModel.account.point}"
+            android:text="@{String.valueOf(viewModel.account.point)}"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="@+id/textView13"
             app:layout_constraintTop_toBottomOf="@+id/textView13"
@@ -92,6 +92,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
             android:text="충전하기"
+            android:visibility="gone"
+            tools:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/textView14"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textView14" />

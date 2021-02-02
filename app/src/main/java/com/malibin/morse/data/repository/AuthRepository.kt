@@ -1,5 +1,6 @@
 package com.malibin.morse.data.repository
 
+import com.malibin.morse.data.entity.Account
 import com.malibin.morse.data.service.MorseService
 import com.malibin.morse.data.service.params.CheckEmailParams
 import com.malibin.morse.data.service.params.CheckNicknameParams
@@ -73,5 +74,13 @@ class AuthRepository @Inject constructor(
 
     suspend fun getRefreshToken(): String? {
         return localDataSource.getRefreshToken().also { printLog("refresh : $it") }
+    }
+
+    suspend fun deleteTokens() {
+        localDataSource.deleteTokens()
+    }
+
+    suspend fun getAccount(): Account = withContext(Dispatchers.IO) {
+        return@withContext morseService.getAccount().data.toAccount()
     }
 }

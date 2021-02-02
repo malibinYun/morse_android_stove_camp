@@ -11,6 +11,7 @@ import com.malibin.morse.data.service.params.SignUpParams
 import com.malibin.morse.data.service.params.VerifyEmailParams
 import com.malibin.morse.data.service.response.BaseResponse
 import com.malibin.morse.data.service.response.LoginResponse
+import com.malibin.morse.data.service.response.MyPageResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -86,6 +87,9 @@ interface MorseService {
     suspend fun sendChatMessage(
         @Body params: SendChatMessageParams,
     ): Response<Unit>
+
+    @GET("auth/mypage")
+    suspend fun getAccount(): BaseResponse<MyPageResponse>
 
     companion object {
         const val BASE_URL = "http://downsups.onstove.com:8005"

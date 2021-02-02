@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.remove
 import com.malibin.morse.data.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -35,6 +36,13 @@ class AuthLocalDataSource @Inject constructor(
         dataStore.edit {
             it[KEY_ACCESS_TOKEN] = accessToken
             it[KEY_REFRESH_TOKEN] = refreshToken
+        }
+    }
+
+    suspend fun deleteTokens() = withContext(Dispatchers.IO) {
+        dataStore.edit {
+            it.remove(KEY_ACCESS_TOKEN)
+            it.remove(KEY_REFRESH_TOKEN)
         }
     }
 

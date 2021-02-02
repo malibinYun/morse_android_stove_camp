@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.malibin.morse.data.entity.Room
 import com.malibin.morse.databinding.ActivityRoomsBinding
 import com.malibin.morse.databinding.ItemRoomBinding
+import com.malibin.morse.presentation.mypage.MyPageActivity
 import com.malibin.morse.presentation.rooms.create.CreateRoomActivity
 import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.presentation.viewer.ViewerActivity
@@ -35,8 +36,7 @@ class RoomsActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.listRoom.adapter = adapter
         binding.buttonCreateRoom.setOnClickListener { deployActivityOf(CreateRoomActivity::class.java) }
-        binding.buttonMypage.setOnClickListener { }
-        binding.buttonMypage.setOnClickListener { }
+        binding.buttonMypage.setOnClickListener { deployActivityOf(MyPageActivity::class.java) }
         binding.windowSwipeRefresh.setOnRefreshListener { roomsViewModel.loadAllRooms() }
         roomsViewModel.rooms.observe(this) {
             printLog(it)
