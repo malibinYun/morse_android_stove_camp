@@ -15,6 +15,7 @@ import java.net.URI
 
 class ChatMessageReceiveClient(
     private val roomIdx: Int,
+    private val token: String,
     private val onMessageCallback: Callback,
 ) : WebSocketClient(HOST_URI) {
 
@@ -24,11 +25,13 @@ class ChatMessageReceiveClient(
         val json = JSONObject().apply {
             put("id", "roomIdx")
             put("roomIdx", roomIdx)
+            put("token", token)
         }
         send(json.toString())
     }
 
     override fun onMessage(message: String?) {
+        printLog("chat onMessage $message")
         val response = gson.fromJson(message, ChatMessageResponse::class.java)
         onMessageCallback.onMessage(response)
     }

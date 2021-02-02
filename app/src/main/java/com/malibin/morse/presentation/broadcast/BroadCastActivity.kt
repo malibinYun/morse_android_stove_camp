@@ -26,8 +26,6 @@ class BroadCastActivity : AppCompatActivity(), TextView.OnEditorActionListener {
     private var binding: ActivityBroadCastBinding? = null
     private val broadCastViewModel: BroadCastViewModel by viewModels()
 
-    private var roomIdx: Int = -1
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -131,7 +129,7 @@ class BroadCastActivity : AppCompatActivity(), TextView.OnEditorActionListener {
         val inputView = requireBinding().textInput
         val message = inputView.text.toString()
         if (message.isBlank()) return
-        broadCastViewModel.sendChatMessage(message, roomIdx)
+        broadCastViewModel.sendChatMessage(message)
         inputView.setText("")
     }
 

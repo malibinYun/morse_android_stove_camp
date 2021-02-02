@@ -83,6 +83,7 @@
                 android:ems="10"
                 android:imeOptions="flagNoExtractUi|actionSend"
                 android:inputType="textPersonName"
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/button_send"
                 app:layout_constraintStart_toStartOf="parent" />

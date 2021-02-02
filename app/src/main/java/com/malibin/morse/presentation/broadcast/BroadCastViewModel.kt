@@ -5,16 +5,19 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.data.repository.AuthRepository
 import com.malibin.morse.data.repository.ChatMessageRepository
 import com.malibin.morse.data.service.params.RequestRoomParams
+import com.malibin.morse.data.service.params.SendChatMessageParams
 import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.websocket.ChatMessageReceiveClient
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
 import com.malibin.morse.rtc.WebRtcClientEvents
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.webrtc.EglBase
 import org.webrtc.VideoSink
@@ -43,17 +46,25 @@ class BroadCastViewModel @ViewModelInject constructor(
     private val _chatMessages = MutableLiveData<List<ChatMessage>>()
     val chatMessages: LiveData<List<ChatMessage>> = _chatMessages
 
+    private val accessToken = runBlocking { authRepository.getAccessToken() }
+        ?: error("token cannot be null")
+
+    private var roomId: Int = -1
+
     fun createBroadcastRoom(roomTitle: String, roomContent: String) {
         val params = RequestRoomParams(
-            token = runBlocking { authRepository.getAccessToken() }
-                ?: error("token cannot be null"),
+            token = accessToken,
             title = roomTitle,
             content = roomContent,
         )
         webRtcClient =
             WebRtcClient(context, eglBase, StreamingMode.BROADCAST, WebRtcClientEventsImpl())
         webRtcClient.connectPeer(params)
-        chatMessageReceiveClient = ChatMessageReceiveClient(1, this)
+    }
+
+    private fun createChatReceiveWebSocketInternal(roomId: Int) {
+        chatMessageReceiveClient = ChatMessageReceiveClient(roomId, accessToken, this)
+        chatMessageReceiveClient.connect()
     }
 
     override fun onMessage(response: ChatMessageResponse) {
@@ -78,16 +89,20 @@ class BroadCastViewModel @ViewModelInject constructor(
         webRtcClient.toggleMic(!isMicActivated)
     }
 
-    fun sendChatMessage(message: String, roomIdx: Int) {
-        val chatMessage = ChatMessage(message, "말리빈")
-        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
-        currentChatMessages.add(chatMessage)
-        _chatMessages.value = currentChatMessages
+    fun sendChatMessage(message: String) {
+//        val chatMessage = ChatMessage(message, "말리빈")
+//        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
+//        currentChatMessages.add(chatMessage)
+//        _chatMessages.value = currentChatMessages
 
-//        viewModelScope.launch {
-//            val token = authRepository.getAccessToken() ?: error("Token must not be null")
-//            chatMessageRepository.sendChatMessage(token, roomIdx, ChatMessage(message))
-//        }
+        viewModelScope.launch {
+            val sendingMessageParams = SendChatMessageParams(
+                roomIdx = roomId,
+                userType = "presenter",
+                textMessage = message,
+            )
+            chatMessageRepository.sendChatMessage(sendingMessageParams)
+        }
     }
 
     fun disconnect() {
@@ -108,6 +123,11 @@ class BroadCastViewModel @ViewModelInject constructor(
             val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
             currentChatMessages.add(chatMessage)
             _chatMessages.value = currentChatMessages
+        }
+
+        override fun onCreateBroadCastRoomId(roomId: Int) {
+            createChatReceiveWebSocketInternal(roomId)
+            this@BroadCastViewModel.roomId = roomId
         }
     }
 }
