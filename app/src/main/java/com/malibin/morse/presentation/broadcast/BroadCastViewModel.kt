@@ -97,7 +97,6 @@ class BroadCastViewModel @ViewModelInject constructor(
 
         viewModelScope.launch {
             val sendingMessageParams = SendChatMessageParams(
-                roomIdx = roomId,
                 userType = "presenter",
                 textMessage = message,
             )

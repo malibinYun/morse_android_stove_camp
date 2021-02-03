@@ -95,7 +95,7 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
             ?: error("cannot find textInput View")
         val message = inputView.text.toString()
         if (message.isBlank()) return
-        viewerViewModel.sendChatMessage(message, room.id)
+        viewerViewModel.sendChatMessage(message, room.presenterIdx)
         inputView.setText("")
     }
 

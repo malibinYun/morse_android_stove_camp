@@ -4,8 +4,9 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 data class Room(
-    @SerializedName("presenterIdx")
+    @SerializedName("roomIdx")
     val id: Int,
+    val presenterIdx: Int,
     val title: String,
     @SerializedName("contents")
     val description: String,

@@ -14,12 +14,6 @@ data class ChatMessage(
     val isPresenter: Boolean = false,
     val id: String = UUID.randomUUID().toString(),
 ) {
-    fun toSendChatMessageParams(roomIdx: Int) = SendChatMessageParams(
-        roomIdx = roomIdx,
-        userType = if (isPresenter) "presenter" else "viewer",
-        textMessage = message,
-    )
-
     enum class Color {
         BLACK, WHITE;
     }

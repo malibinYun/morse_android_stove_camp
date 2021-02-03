@@ -10,6 +10,8 @@ import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.data.repository.AuthRepository
 import com.malibin.morse.data.repository.ChatMessageRepository
 import com.malibin.morse.data.service.params.RequestRoomParams
+import com.malibin.morse.data.service.params.SendChatMessageParams
+import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
 import com.malibin.morse.rtc.WebRtcClientEvents
@@ -65,16 +67,16 @@ class ViewerViewModel @ViewModelInject constructor(
         webRtcClient.detachVideoRenderer(renderer)
     }
 
-    fun sendChatMessage(message: String, roomIdx: Int) {
-        val chatMessage = ChatMessage(message, "말리빈")
-        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
-        currentChatMessages.add(chatMessage)
-        _chatMessages.value = currentChatMessages
+    fun sendChatMessage(message: String, presenterId: Int) {
+//        val chatMessage = ChatMessage(message, "말리빈")
+//        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
+//        currentChatMessages.add(chatMessage)
+//        _chatMessages.value = currentChatMessages
 
-//        viewModelScope.launch {
-//            val token = authRepository.getAccessToken() ?: error("Token must not be null")
-//            chatMessageRepository.sendChatMessage(token, roomIdx, ChatMessage(message))
-//        }
+        viewModelScope.launch {
+            val chatMessage = SendChatMessageParams("viewer", message, presenterId.toString())
+            chatMessageRepository.sendChatMessage(chatMessage)
+        }
     }
 
     override fun onCleared() {
@@ -89,6 +91,7 @@ class ViewerViewModel @ViewModelInject constructor(
         }
 
         override fun onChatReceived(chatMessage: ChatMessage) {
+            printLog("onChatReceived : $chatMessage")
             val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
             currentChatMessages.add(chatMessage)
             _chatMessages.value = currentChatMessages

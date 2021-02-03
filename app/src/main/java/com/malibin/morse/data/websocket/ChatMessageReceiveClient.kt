@@ -23,8 +23,7 @@ class ChatMessageReceiveClient(
 
     override fun onOpen(handshakedata: ServerHandshake?) {
         val json = JSONObject().apply {
-            put("id", "roomIdx")
-            put("roomIdx", roomIdx)
+            put("id", "start")
             put("token", token)
         }
         send(json.toString())
