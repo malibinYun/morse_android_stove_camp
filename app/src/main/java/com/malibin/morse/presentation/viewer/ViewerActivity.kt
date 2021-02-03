@@ -48,7 +48,7 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
         binding.lifecycleOwner = this
         setContentView(binding.root)
 
-        viewerViewModel.connect(room.id)
+        viewerViewModel.connect(room.presenterIdx)
         viewerViewModel.rtcState.observe(this) {
             if (it == WebRtcClientEvents.State.CONNECTED) attachRenderer()
             if (it == WebRtcClientEvents.State.ALREADY_CLOSED) onBroadCastAlreadyClosed()

@@ -261,3 +261,29 @@ videoCapturer를 만들어야해서 (아니 근데 왜 이름이 captor가 아�
 remoteRenderer는 (서버로부터 오는 영상을 받아서 보여주는 뷰)
 
 onAddStream에서만 추가한다.
+
+
+
+
+
+### DataChannel 하...
+
+구글 예제 코드 대로 DataChannel를 생성하고 사용하면 안된다.
+
+데이터 채널 객체 자체는 만들어 지는데, send가 되지 않음. release할 때도 dispose를 호출 하면 exception이 발생함. (만들어진게 없다면서). datachannel.send하면 (natice call임) 리턴값으로 boolean이 떨어지는데, 이게 false로만 떨어짐.
+
+offer를만들기 위해 전달하는 sdp constrains 값을 만들때, MediaConstraint의 Key Value 쌍에다가 아래 값을 추가해봤지만 소용이없었음.
+
+```
+            mandatory.add(MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"))
+            optional.add(MediaConstraints.KeyValuePair("RtpDataChannels", "true"))
+```
+
+데이터 채널 프로토콜에는 sctp, rtp가 있는데,  RTP는 안드로이드에서는 지원이 되지 않는다고함.
+
+그래서 SCTP 를 사용할 때 쓴다는 해당 키발류 쌍을 추가하니 동작하기 시작함. send에도 true를 반환함. 흑흑...
+
+```
+            optional.add(MediaConstraints.KeyValuePair("internalSctpDataChannels", "true"))
+```
+

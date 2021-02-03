@@ -32,7 +32,7 @@ class ChatMessageReceiveClient(
     override fun onMessage(message: String?) {
         printLog("chat onMessage $message")
         val response = gson.fromJson(message, ChatMessageResponse::class.java)
-        onMessageCallback.onMessage(response)
+        onMessageCallback.onMessageFromSocket(response)
     }
 
     override fun onClose(code: Int, reason: String?, remote: Boolean) {
@@ -48,6 +48,6 @@ class ChatMessageReceiveClient(
     }
 
     interface Callback {
-        fun onMessage(response: ChatMessageResponse)
+        fun onMessageFromSocket(response: ChatMessageResponse)
     }
 }

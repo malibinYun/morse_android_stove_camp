@@ -24,11 +24,13 @@ import java.nio.ByteBuffer
 
 class PeerConnectionClient(
     private val peerConnection: PeerConnection,
+    private val dataChannelObserver: DataChannelObserver,
 ) {
     private var createOfferCallback: CreateOfferCallback? = null
 
     private val dataChannel: DataChannel =
-        peerConnection.createDataChannel("dataChannelLabel", DataChannel.Init())
+        peerConnection.createDataChannel("data", DataChannel.Init())
+            .apply { registerObserver(dataChannelObserver) }
 
     // 이노메 옵저버 위치 다시 생각해봐야함
     private val sdpObserver = SessionDescriptionProtocolObserver()
@@ -66,6 +68,9 @@ class PeerConnectionClient(
         return MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
+            optional.add(MediaConstraints.KeyValuePair("internalSctpDataChannels", "true"))
+//            mandatory.add(MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"))
+//            optional.add(MediaConstraints.KeyValuePair("RtpDataChannels", "true"))
         }
     }
 
@@ -121,7 +126,8 @@ class PeerConnectionClient(
     fun sendChatMessage(chatMessageResponse: ChatMessageResponse) {
         val jsonString: String = Gson().toJson(chatMessageResponse)
         val buffer = DataChannel.Buffer(ByteBuffer.wrap(jsonString.toByteArray()), false)
-        dataChannel.send(buffer)
+
+        dataChannel.send(buffer).also { printLog("dataChannel.send : $it") }
     }
 
     fun close() {

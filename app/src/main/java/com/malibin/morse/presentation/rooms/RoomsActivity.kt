@@ -33,6 +33,7 @@ class RoomsActivity : AppCompatActivity() {
 
     private fun initView(binding: ActivityRoomsBinding) {
         val adapter = RoomsAdapter()
+        binding.viewModel = roomsViewModel
         binding.lifecycleOwner = this
         binding.listRoom.adapter = adapter
         binding.buttonCreateRoom.setOnClickListener { deployActivityOf(CreateRoomActivity::class.java) }

@@ -28,7 +28,8 @@ data class SocketResponse(
         VIEWER_RESPONSE("viewerResponse"),
         ICE_CANDIDATE("iceCandidate"),
         STOP_COMMUNICATION("stopCommunication"),
-        ERROR_RESPONSE("serverException");
+        ERROR_RESPONSE("serverException"),
+        USER_ERROR_RESPONSE("userException");
 
         fun has(value: String): Boolean = this.value == value
 

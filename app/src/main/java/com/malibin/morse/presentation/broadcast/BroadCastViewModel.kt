@@ -67,8 +67,12 @@ class BroadCastViewModel @ViewModelInject constructor(
         chatMessageReceiveClient.connect()
     }
 
-    override fun onMessage(response: ChatMessageResponse) {
+    override fun onMessageFromSocket(response: ChatMessageResponse) {
         webRtcClient.sendChatMessage(response)
+
+        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
+        currentChatMessages.add(response.toChatMessage())
+        _chatMessages.postValue(currentChatMessages)
     }
 
     fun attachRenderer(renderer: VideoSink) {
@@ -99,6 +103,7 @@ class BroadCastViewModel @ViewModelInject constructor(
             val sendingMessageParams = SendChatMessageParams(
                 userType = "presenter",
                 textMessage = message,
+                presenterIdx = null
             )
             chatMessageRepository.sendChatMessage(sendingMessageParams)
         }
@@ -119,9 +124,6 @@ class BroadCastViewModel @ViewModelInject constructor(
         }
 
         override fun onChatReceived(chatMessage: ChatMessage) {
-            val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
-            currentChatMessages.add(chatMessage)
-            _chatMessages.value = currentChatMessages
         }
 
         override fun onCreateBroadCastRoomId(roomId: Int) {

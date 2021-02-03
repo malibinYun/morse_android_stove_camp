@@ -9,5 +9,5 @@ data class RequestRoomParams(
     val token: String,
     val title: String? = null,
     val content: String? = null,
-    val roomId: Int? = null,
+    val presenterIdx: Int? = null,
 )

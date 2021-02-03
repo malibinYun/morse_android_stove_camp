@@ -6,7 +6,6 @@ import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -64,12 +63,10 @@ class WebSocketRtcClient(
         CoroutineScope(Dispatchers.IO).launch {
             var count = 0
             while (isActive) {
-                sendPing()
-                printLog("ping send")
+                if (isOpen) sendPing().also { printLog("ping send") }
                 count++
                 delay(1_000)
             }
-//            this.cancel()
         }
     }
 
@@ -107,7 +104,7 @@ class WebSocketRtcClient(
                 json.put("contents", params.content)
             }
             StreamingMode.VIEWER -> {
-                json.put("presenterIdx", params.roomId)
+                json.put("presenterIdx", params.presenterIdx)
             }
         }
         send(json.toString())

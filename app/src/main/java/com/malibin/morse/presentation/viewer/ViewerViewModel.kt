@@ -43,13 +43,13 @@ class ViewerViewModel @ViewModelInject constructor(
 
     private var isInitial: Boolean = true
 
-    fun connect(roomIdx: Int) {
+    fun connect(presenterId: Int) {
         if (isInitial) {
             isInitial = false
             val params = RequestRoomParams(
                 token = runBlocking { authRepository.getAccessToken() }
                     ?: error("token cannot be null"),
-                roomId = roomIdx,
+                presenterIdx = presenterId,
             )
             webRtcClient =
                 WebRtcClient(context, eglBase, StreamingMode.VIEWER, WebRtcClientEventsImpl())
@@ -74,7 +74,7 @@ class ViewerViewModel @ViewModelInject constructor(
 //        _chatMessages.value = currentChatMessages
 
         viewModelScope.launch {
-            val chatMessage = SendChatMessageParams("viewer", message, presenterId.toString())
+            val chatMessage = SendChatMessageParams("viewer", message, presenterId)
             chatMessageRepository.sendChatMessage(chatMessage)
         }
     }
@@ -94,7 +94,7 @@ class ViewerViewModel @ViewModelInject constructor(
             printLog("onChatReceived : $chatMessage")
             val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
             currentChatMessages.add(chatMessage)
-            _chatMessages.value = currentChatMessages
+            _chatMessages.postValue(currentChatMessages)
         }
     }
 }

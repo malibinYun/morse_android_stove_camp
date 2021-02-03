@@ -8,6 +8,7 @@ import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.service.response.SocketResponse
 import com.malibin.morse.presentation.utils.printLog
 import org.java_websocket.handshake.ServerHandshake
+import org.json.JSONObject
 import org.webrtc.DataChannel
 import org.webrtc.EglBase
 import org.webrtc.IceCandidate
@@ -33,7 +34,7 @@ class WebRtcClient(
         createPeerConnectionFactory(context, eglBase)
     }
     private val peerConnectionClient: PeerConnectionClient by lazy {
-        PeerConnectionClient(createPeerConnection())
+        PeerConnectionClient(createPeerConnection(), DataChannelMessageReceiver())
     }
     private val webSocketRtcClient: WebSocketRtcClient by lazy {
         WebSocketRtcClient(WebSocketCallbackImpl())
@@ -58,6 +59,7 @@ class WebRtcClient(
             keyType = PeerConnection.KeyType.ECDSA
             enableDtlsSrtp = true
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
+//            enableRtpDataChannel = true
         }
     }
 
@@ -128,7 +130,6 @@ class WebRtcClient(
         }
 
         override fun onMessage(response: SocketResponse?) {
-//            printLog("onMessage Called // response : $response")
             if (response == null) return
 
             when (response.responseId) {
@@ -148,7 +149,7 @@ class WebRtcClient(
                 SocketResponse.ID.STOP_COMMUNICATION -> {
                     webRtcClientEvents.onStateChanged(WebRtcClientEvents.State.FINISH_BROADCAST)
                 }
-                SocketResponse.ID.ERROR_RESPONSE -> {
+                else -> {
                     webRtcClientEvents.onStateChanged(WebRtcClientEvents.State.ERROR)
                 }
             }
@@ -169,6 +170,20 @@ class WebRtcClient(
     private inner class CreateOfferCallbackImpl : CreateOfferCallback {
         override fun onOfferSetSuccess(sessionDescription: SessionDescription) {
             webSocketRtcClient.sendOfferSessionDescription(sessionDescription, streamingMode)
+        }
+    }
+
+    private inner class DataChannelMessageReceiver : DataChannelObserver() {
+        override fun onMessage(buffer: DataChannel.Buffer?) {
+            val byteArray = ByteArray(buffer?.data?.capacity() ?: return)
+            buffer.data.get(byteArray)
+            val messageJson = JSONObject(String(byteArray))
+            val nickname = messageJson["nickname"].toString()
+            val message = messageJson["message"].toString()
+
+            printLog("DataChannel onMessage : $messageJson")
+
+            webRtcClientEvents.onChatReceived(ChatMessage(message, nickname))
         }
     }
 
@@ -217,24 +232,6 @@ class WebRtcClient(
 
         override fun onDataChannel(dataChannel: DataChannel?) {
             printLog("onDataChannel // DataChannel opened")
-
-            dataChannel?.registerObserver(object : DataChannel.Observer {
-                override fun onMessage(buffer: DataChannel.Buffer?) {
-                    val byteArray = ByteArray(buffer?.data?.capacity() ?: return)
-                    buffer.data.get(byteArray)
-                    printLog("DataChannel onMessage : $byteArray")
-
-                    webRtcClientEvents.onChatReceived(ChatMessage("됨ㅋ", "호롤리"))
-                }
-
-                override fun onBufferedAmountChange(previousAmount: Long) {
-                    printLog("DataChannel onBufferedAmountChange // label : ${dataChannel.label()}, state : ${dataChannel.state()}")
-                }
-
-                override fun onStateChange() {
-                    printLog("DataChannel onStateChange // label : ${dataChannel.label()}, state : ${dataChannel.state()}")
-                }
-            })
         }
 
         override fun onRenegotiationNeeded() {
