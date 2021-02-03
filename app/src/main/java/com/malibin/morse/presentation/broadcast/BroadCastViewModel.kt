@@ -13,6 +13,7 @@ import com.malibin.morse.data.service.params.RequestRoomParams
 import com.malibin.morse.data.service.params.SendChatMessageParams
 import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.data.websocket.ChatMessageReceiveClient
+import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.rtc.StreamingMode
 import com.malibin.morse.rtc.WebRtcClient
 import com.malibin.morse.rtc.WebRtcClientEvents
@@ -49,7 +50,8 @@ class BroadCastViewModel @ViewModelInject constructor(
     private val accessToken = runBlocking { authRepository.getAccessToken() }
         ?: error("token cannot be null")
 
-    private var roomId: Int = -1
+    var roomId: Int = -1
+        private set
 
     fun createBroadcastRoom(roomTitle: String, roomContent: String) {
         val params = RequestRoomParams(
@@ -62,8 +64,8 @@ class BroadCastViewModel @ViewModelInject constructor(
         webRtcClient.connectPeer(params)
     }
 
-    private fun createChatReceiveWebSocketInternal(roomId: Int) {
-        chatMessageReceiveClient = ChatMessageReceiveClient(roomId, accessToken, this)
+    private fun createChatReceiveWebSocketInternal() {
+        chatMessageReceiveClient = ChatMessageReceiveClient(accessToken, this)
         chatMessageReceiveClient.connect()
     }
 
@@ -93,20 +95,13 @@ class BroadCastViewModel @ViewModelInject constructor(
         webRtcClient.toggleMic(!isMicActivated)
     }
 
-    fun sendChatMessage(message: String) {
-//        val chatMessage = ChatMessage(message, "말리빈")
-//        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
-//        currentChatMessages.add(chatMessage)
-//        _chatMessages.value = currentChatMessages
-
-        viewModelScope.launch {
-            val sendingMessageParams = SendChatMessageParams(
-                userType = "presenter",
-                textMessage = message,
-                presenterIdx = null
-            )
-            chatMessageRepository.sendChatMessage(sendingMessageParams)
-        }
+    fun sendChatMessage(message: String) = viewModelScope.launch {
+        val sendingMessageParams = SendChatMessageParams(
+            userType = "presenter",
+            textMessage = message,
+            presenterIdx = null
+        )
+        chatMessageRepository.sendChatMessage(sendingMessageParams)
     }
 
     fun disconnect() {
@@ -126,8 +121,8 @@ class BroadCastViewModel @ViewModelInject constructor(
         override fun onChatReceived(chatMessage: ChatMessage) {
         }
 
-        override fun onCreateBroadCastRoomId(roomId: Int) {
-            createChatReceiveWebSocketInternal(roomId)
+        override fun onCreateRoomId(roomId: Int) {
+            createChatReceiveWebSocketInternal()
             this@BroadCastViewModel.roomId = roomId
         }
     }

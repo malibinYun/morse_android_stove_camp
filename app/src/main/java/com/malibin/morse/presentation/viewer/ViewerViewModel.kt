@@ -67,16 +67,9 @@ class ViewerViewModel @ViewModelInject constructor(
         webRtcClient.detachVideoRenderer(renderer)
     }
 
-    fun sendChatMessage(message: String, presenterId: Int) {
-//        val chatMessage = ChatMessage(message, "말리빈")
-//        val currentChatMessages = _chatMessages.value?.toMutableList() ?: mutableListOf()
-//        currentChatMessages.add(chatMessage)
-//        _chatMessages.value = currentChatMessages
-
-        viewModelScope.launch {
-            val chatMessage = SendChatMessageParams("viewer", message, presenterId)
-            chatMessageRepository.sendChatMessage(chatMessage)
-        }
+    fun sendChatMessage(message: String, presenterId: Int) = viewModelScope.launch {
+        val chatMessage = SendChatMessageParams("viewer", message, presenterId)
+        chatMessageRepository.sendChatMessage(chatMessage)
     }
 
     override fun onCleared() {

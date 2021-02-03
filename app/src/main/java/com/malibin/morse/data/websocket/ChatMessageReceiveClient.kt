@@ -3,6 +3,11 @@ package com.malibin.morse.data.websocket
 import com.google.gson.Gson
 import com.malibin.morse.data.service.response.ChatMessageResponse
 import com.malibin.morse.presentation.utils.printLog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.json.JSONObject
@@ -14,7 +19,6 @@ import java.net.URI
  */
 
 class ChatMessageReceiveClient(
-    private val roomIdx: Int,
     private val token: String,
     private val onMessageCallback: Callback,
 ) : WebSocketClient(HOST_URI) {
@@ -27,10 +31,22 @@ class ChatMessageReceiveClient(
             put("token", token)
         }
         send(json.toString())
+        sendPingsPerSecond()
+    }
+
+    private fun sendPingsPerSecond() {
+        CoroutineScope(Dispatchers.IO).launch {
+            var count = 0
+            while (isActive) {
+                if (isOpen) sendPing().also { printLog("ping send") }
+                count++
+                delay(1_000)
+            }
+        }
     }
 
     override fun onMessage(message: String?) {
-        printLog("chat onMessage $message")
+        printLog("ChatMessageReceiveClient onMessage $message")
         val response = gson.fromJson(message, ChatMessageResponse::class.java)
         onMessageCallback.onMessageFromSocket(response)
     }

@@ -32,6 +32,8 @@ class PeerConnectionClient(
         peerConnection.createDataChannel("data", DataChannel.Init())
             .apply { registerObserver(dataChannelObserver) }
 
+    private val gson = Gson()
+
     // 이노메 옵저버 위치 다시 생각해봐야함
     private val sdpObserver = SessionDescriptionProtocolObserver()
 
@@ -124,7 +126,7 @@ class PeerConnectionClient(
     }
 
     fun sendChatMessage(chatMessageResponse: ChatMessageResponse) {
-        val jsonString: String = Gson().toJson(chatMessageResponse)
+        val jsonString: String = gson.toJson(chatMessageResponse)
         val buffer = DataChannel.Buffer(ByteBuffer.wrap(jsonString.toByteArray()), false)
 
         dataChannel.send(buffer).also { printLog("dataChannel.send : $it") }

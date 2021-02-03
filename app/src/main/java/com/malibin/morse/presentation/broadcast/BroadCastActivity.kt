@@ -13,7 +13,6 @@ import com.malibin.morse.R
 import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.databinding.ActivityBroadCastBinding
 import com.malibin.morse.presentation.chatting.ChatMessagesAdapter
-import com.malibin.morse.presentation.chatting.RandomColorGenerator
 import com.malibin.morse.presentation.utils.hideStatusBar
 import com.malibin.morse.presentation.utils.showToast
 import com.malibin.morse.rtc.WebRtcClientEvents
@@ -25,6 +24,7 @@ import org.webrtc.VideoSink
 class BroadCastActivity : AppCompatActivity(), TextView.OnEditorActionListener {
     private var binding: ActivityBroadCastBinding? = null
     private val broadCastViewModel: BroadCastViewModel by viewModels()
+    private var chatMessagesAdapter: ChatMessagesAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,16 +42,17 @@ class BroadCastActivity : AppCompatActivity(), TextView.OnEditorActionListener {
         else askPermissions()
 
         broadCastViewModel.rtcState.observe(this) {
-            if (it == WebRtcClientEvents.State.CONNECTED) attachRenderer()
+            if (it == WebRtcClientEvents.State.CONNECTED) onBroadCastStarted()
         }
 
-        val chatMessagesAdapter = ChatMessagesAdapter(RandomColorGenerator())
-        chatMessagesAdapter.chatMessageColor = ChatMessage.Color.WHITE
+        this.chatMessagesAdapter = ChatMessagesAdapter()
+        chatMessagesAdapter?.chatMessageColor = ChatMessage.Color.WHITE
 
         binding.listChatting.adapter = chatMessagesAdapter
+        binding.listChatting.itemAnimator = null
         binding.buttonSend.setOnClickListener { sendChatMessage() }
         broadCastViewModel.chatMessages.observe(this) {
-            chatMessagesAdapter.submitList(it) { scrollBottomOfChatting() }
+            chatMessagesAdapter?.submitList(it) { scrollBottomOfChatting() }
         }
     }
 
@@ -103,6 +104,11 @@ class BroadCastActivity : AppCompatActivity(), TextView.OnEditorActionListener {
         val isCameraGranted = ActivityCompat.checkSelfPermission(this, CAMERA_PERMISSION)
         val isMicGranted = ActivityCompat.checkSelfPermission(this, MIC_PERMISSION)
         return isCameraGranted == PERMISSION_GRANTED && isMicGranted == PERMISSION_GRANTED
+    }
+
+    private fun onBroadCastStarted() {
+        attachRenderer()
+        chatMessagesAdapter?.roomRandomSeed = broadCastViewModel.roomId
     }
 
     private fun attachRenderer() {

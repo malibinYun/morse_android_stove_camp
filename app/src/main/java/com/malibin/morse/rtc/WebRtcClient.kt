@@ -140,7 +140,7 @@ class WebRtcClient(
                     }
                     val sdp = SessionDescription(SessionDescription.Type.ANSWER, response.sdpAnswer)
                     peerConnectionClient.setRemoteDescription(sdp)
-                    webRtcClientEvents.onCreateBroadCastRoomId(response.roomIdx ?: return)
+                    webRtcClientEvents.onCreateRoomId(response.roomIdx ?: return)
                 }
                 SocketResponse.ID.ICE_CANDIDATE -> {
                     val candidateResponse = response.candidate ?: error("candidate cannot be null")

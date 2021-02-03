@@ -12,7 +12,7 @@ interface WebRtcClientEvents {
 
     fun onChatReceived(chatMessage: ChatMessage)
 
-    open fun onCreateBroadCastRoomId(roomId: Int) {
+    fun onCreateRoomId(roomId: Int) {
     }
 
     enum class State {

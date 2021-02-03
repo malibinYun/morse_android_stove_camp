@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.databinding.BindingAdapter
+import kotlin.random.Random
 
 /**
  * Created By Malibin
@@ -32,6 +33,14 @@ fun Context.isPortraitOrientation(): Boolean {
 
 fun Activity.hideStatusBar() {
     window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+}
+
+fun createRandomColorCode(seed: Int = System.currentTimeMillis().toInt()): String {
+    val random = Random(seed)
+    val red = random.nextInt(0, 256)
+    val green = random.nextInt(0, 256)
+    val blue = random.nextInt(0, 256)
+    return "#%02X%02X%02X".format(red, green, blue)
 }
 
 @BindingAdapter("isEnabled")

@@ -13,7 +13,6 @@ import com.malibin.morse.data.entity.Room
 import com.malibin.morse.databinding.ActivityViewerLandscapeBinding
 import com.malibin.morse.databinding.ActivityViewerPortraitBinding
 import com.malibin.morse.presentation.chatting.ChatMessagesAdapter
-import com.malibin.morse.presentation.chatting.RandomColorGenerator
 import com.malibin.morse.presentation.utils.hideStatusBar
 import com.malibin.morse.presentation.utils.isPortraitOrientation
 import com.malibin.morse.presentation.utils.printLog
@@ -37,9 +36,7 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val chatMessagesAdapter = ChatMessagesAdapter(RandomColorGenerator())
-        this.chatMessagesAdapter = chatMessagesAdapter
-
+        this.chatMessagesAdapter = ChatMessagesAdapter().apply { roomRandomSeed = room.id }
         val binding = if (isPortraitOrientation()) {
             ActivityViewerPortraitBinding.inflate(layoutInflater).apply { initView(this) }
         } else {
@@ -55,7 +52,7 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
             if (it == WebRtcClientEvents.State.FINISH_BROADCAST) onBroadCastClosed()
         }
         viewerViewModel.chatMessages.observe(this) {
-            chatMessagesAdapter.submitList(it) { scrollBottomOfChatting() }
+            chatMessagesAdapter?.submitList(it) { scrollBottomOfChatting() }
         }
     }
 

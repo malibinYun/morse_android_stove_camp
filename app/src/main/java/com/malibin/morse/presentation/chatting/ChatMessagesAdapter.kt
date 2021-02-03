@@ -14,19 +14,21 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.malibin.morse.data.entity.ChatMessage
 import com.malibin.morse.databinding.ItemChatMessageBinding
+import com.malibin.morse.presentation.utils.createRandomColorCode
+import com.malibin.morse.presentation.utils.printLog
 
 /**
  * Created By Malibin
  * on 1월 27, 2021
  */
 
-class ChatMessagesAdapter(
-    private val randomColorGenerator: ColorGenerator,
-) : ListAdapter<ChatMessage, ChatMessagesAdapter.ViewHolder>(DiffItemCallback()) {
+class ChatMessagesAdapter :
+    ListAdapter<ChatMessage, ChatMessagesAdapter.ViewHolder>(DiffItemCallback()) {
 
     private val nicknameColors = mutableMapOf<String, String>()
 
     var chatMessageColor = ChatMessage.Color.BLACK
+    var roomRandomSeed: Int = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -35,9 +37,11 @@ class ChatMessagesAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        printLog(nicknameColors.toString())
         val chatMessage = getItem(position)
         if (nicknameColors[chatMessage.userNickname] == null) {
-            nicknameColors[chatMessage.userNickname] = randomColorGenerator.createColorCode()
+            val newSeed = roomRandomSeed + chatMessage.userNickname.hashCode()
+            nicknameColors[chatMessage.userNickname] = createRandomColorCode(newSeed)
         }
         holder.bind(chatMessage)
     }
