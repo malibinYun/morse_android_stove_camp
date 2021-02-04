@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.databinding.BindingAdapter
@@ -32,7 +33,10 @@ fun Context.isPortraitOrientation(): Boolean {
 }
 
 fun Activity.hideStatusBar() {
-    window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+    window.setFlags(
+        WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        WindowManager.LayoutParams.FLAG_FULLSCREEN
+    )
 }
 
 fun createRandomColorCode(seed: Int = System.currentTimeMillis().toInt()): String {
