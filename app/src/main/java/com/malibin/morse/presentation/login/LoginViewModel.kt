@@ -55,6 +55,10 @@ class LoginViewModel @ViewModelInject constructor(
         }
     }
 
+    fun loadEmail() = viewModelScope.launch {
+        email.value = authRepository.getEmail() ?: ""
+    }
+
     private fun handleLoginFail() = HttpExceptionHandler {
         isLoading.value = false
         toastMessage.value = it.message

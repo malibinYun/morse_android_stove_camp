@@ -26,5 +26,6 @@ class MyPageViewModel @ViewModelInject constructor(
 
     fun logout() = viewModelScope.launch {
         authRepository.deleteTokens()
+        authRepository.deleteEmail()
     }
 }

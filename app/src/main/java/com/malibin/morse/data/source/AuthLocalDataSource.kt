@@ -46,8 +46,21 @@ class AuthLocalDataSource @Inject constructor(
         }
     }
 
+    suspend fun saveEmail(nickname: String) = withContext(Dispatchers.IO) {
+        dataStore.edit { it[KEY_EMAIL] = nickname }
+    }
+
+    suspend fun getEmail() = withContext(Dispatchers.IO) {
+        return@withContext dataStore[KEY_EMAIL].first()
+    }
+
+    suspend fun deleteEmail() = withContext(Dispatchers.IO) {
+        dataStore.edit { it.remove(KEY_EMAIL) }
+    }
+
     companion object {
         private val KEY_ACCESS_TOKEN = preferencesKey<String>("KEY_ACCESS_TOKEN")
         private val KEY_REFRESH_TOKEN = preferencesKey<String>("KEY_REFRESH_TOKEN")
+        private val KEY_EMAIL = preferencesKey<String>("KEY_EMAIL")
     }
 }

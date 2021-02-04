@@ -34,6 +34,11 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.autoLogin()
     }
 
+    override fun onResume() {
+        super.onResume()
+        loginViewModel.loadEmail()
+    }
+
     private fun initView(binding: ActivityLoginBinding) {
         binding.viewModel = loginViewModel
         binding.lifecycleOwner = this

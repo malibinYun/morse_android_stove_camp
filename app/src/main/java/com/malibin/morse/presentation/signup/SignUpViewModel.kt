@@ -124,6 +124,7 @@ class SignUpViewModel @ViewModelInject constructor(
             _isLoading.value = false
             toastMessage.value = R.string.sign_up_success
             isSignUpSuccess.call()
+            authRepository.saveEmail(getEmail())
         }
     }
 

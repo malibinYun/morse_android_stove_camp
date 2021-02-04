@@ -83,4 +83,16 @@ class AuthRepository @Inject constructor(
     suspend fun getAccount(): Account = withContext(Dispatchers.IO) {
         return@withContext morseService.getAccount().data.toAccount()
     }
+
+    suspend fun saveEmail(nickname: String) {
+        localDataSource.saveEmail(nickname)
+    }
+
+    suspend fun getEmail(): String? {
+        return localDataSource.getEmail()
+    }
+
+    suspend fun deleteEmail() {
+        localDataSource.deleteEmail()
+    }
 }
