@@ -17,11 +17,7 @@
         android:theme="@style/Theme.Morse"
         android:usesCleartextTraffic="true">
         <activity android:name=".presentation.replay.ReplayActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".presentation.rooms.create.CreateRoomActivity" />
         <activity android:name=".presentation.rooms.RoomsActivity"></activity>
@@ -32,7 +28,11 @@
             android:screenOrientation="landscape" />
         <activity android:name=".presentation.signup.SignUpActivity" />
         <activity android:name=".presentation.login.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".presentation.mypage.MyPageActivity"></activity>
     </application>

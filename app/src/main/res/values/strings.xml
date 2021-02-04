@@ -15,4 +15,5 @@
     <string name="sign_up_success">회원가입이 완료되었습니다.</string>
     <string name="broadcast_already_closed">이미 종료된 방송입니다 ㅠㅠ</string>
     <string name="broadcast_closed">방송이 종료되었습니다</string>
+    <string name="nickname_of">%s의</string>
 </resources>

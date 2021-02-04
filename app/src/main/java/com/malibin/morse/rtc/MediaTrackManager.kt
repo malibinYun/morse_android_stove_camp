@@ -76,7 +76,7 @@ class MediaTrackManager(
             SurfaceTextureHelper.create("CaptureThread", eglBase.eglBaseContext)
         val videoSource = factory.createVideoSource(videoCapturer.isScreencast)
         videoCapturer.initialize(surfaceTextureHelper, context, videoSource.capturerObserver)
-        videoCapturer.startCapture(1280, 720, 30) // video width, height, fps
+        videoCapturer.startCapture(1920, 1080, 60) // video width, height, fps
         return videoSource
     }
 

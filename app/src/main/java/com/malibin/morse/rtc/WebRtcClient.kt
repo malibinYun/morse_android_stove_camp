@@ -178,10 +178,9 @@ class WebRtcClient(
             val byteArray = ByteArray(buffer?.data?.capacity() ?: return)
             buffer.data.get(byteArray)
             val messageJson = JSONObject(String(byteArray))
+            printLog("DataChannel onMessage : $messageJson")
             val nickname = messageJson["nickname"].toString()
             val message = messageJson["message"].toString()
-
-            printLog("DataChannel onMessage : $messageJson")
 
             webRtcClientEvents.onChatReceived(ChatMessage(message, nickname))
         }

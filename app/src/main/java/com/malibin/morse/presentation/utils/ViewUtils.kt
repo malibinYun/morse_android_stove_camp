@@ -5,9 +5,12 @@ import android.content.Context
 import android.content.res.Configuration
 import android.view.View
 import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.databinding.BindingAdapter
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.random.Random
 
 /**
@@ -55,4 +58,9 @@ fun bindingIsEnabled(view: View, isEnabled: Boolean?) {
 @BindingAdapter("isActivated")
 fun bindingIsActivated(view: View, isActivated: Boolean?) {
     view.isActivated = isActivated ?: false
+}
+
+@BindingAdapter("date")
+fun bindingDate(textView: TextView, date: Date?) {
+    textView.text = SimpleDateFormat("yyyy.MM.dd", Locale.KOREA).format(date ?: return)
 }
