@@ -1,9 +1,8 @@
-package com.malibin.morse.presentation.replay
+package com.malibin.morse.presentation.replay.player
 
 import android.content.pm.ActivityInfo
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import android.widget.MediaController
 import androidx.activity.viewModels
@@ -44,5 +43,9 @@ class ReplayActivity : AppCompatActivity() {
             }
             return@setOnInfoListener true
         }
+    }
+
+    companion object {
+        const val KEY_VIDEO_URL = "KEY_VIDEO_URL"
     }
 }

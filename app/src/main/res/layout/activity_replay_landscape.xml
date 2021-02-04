@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.malibin.morse.presentation.replay.ReplayViewModel" />
+            type="com.malibin.morse.presentation.replay.player.ReplayViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="horizontal"
-        tools:context=".presentation.replay.ReplayActivity">
+        tools:context=".presentation.replay.player.ReplayActivity">
 
         <VideoView
             android:id="@+id/videoView"

@@ -16,13 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Morse"
         android:usesCleartextTraffic="true">
-        <activity android:name=".presentation.replay.ReplayActivity">
-
-        </activity>
+        <activity android:name=".presentation.replay.ReplaysActivity"></activity>
+        <activity android:name=".presentation.replay.player.ReplayActivity"></activity>
         <activity android:name=".presentation.rooms.create.CreateRoomActivity" />
-        <activity android:name=".presentation.rooms.RoomsActivity"></activity>
+        <activity android:name=".presentation.rooms.RoomsActivity" />
         <activity android:name=".presentation.TestActivity" />
-        <activity android:name=".presentation.viewer.ViewerActivity"></activity>
+        <activity android:name=".presentation.viewer.ViewerActivity" />
         <activity
             android:name=".presentation.broadcast.BroadCastActivity"
             android:screenOrientation="landscape" />
@@ -34,7 +33,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.mypage.MyPageActivity"></activity>
+        <activity android:name=".presentation.mypage.MyPageActivity" />
     </application>
 
 </manifest>

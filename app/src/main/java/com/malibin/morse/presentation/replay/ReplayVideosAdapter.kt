@@ -16,7 +16,7 @@ import com.malibin.morse.databinding.ItemReplayVideoBinding
 class ReplayVideosAdapter :
     ListAdapter<ReplayVideo, ReplayVideosAdapter.ViewHolder>(DiffItemCallback()) {
 
-    private var onItemClickListener: ((ReplayVideo) -> Unit)? = null
+    var onItemClickListener: ((ReplayVideo) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)

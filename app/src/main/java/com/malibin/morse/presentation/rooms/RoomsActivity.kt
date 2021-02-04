@@ -12,6 +12,7 @@ import com.malibin.morse.data.entity.Room
 import com.malibin.morse.databinding.ActivityRoomsBinding
 import com.malibin.morse.databinding.ItemRoomBinding
 import com.malibin.morse.presentation.mypage.MyPageActivity
+import com.malibin.morse.presentation.replay.ReplaysActivity
 import com.malibin.morse.presentation.rooms.create.CreateRoomActivity
 import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.presentation.viewer.ViewerActivity
@@ -32,16 +33,17 @@ class RoomsActivity : AppCompatActivity() {
     }
 
     private fun initView(binding: ActivityRoomsBinding) {
-        val adapter = RoomsAdapter()
+        val roomsAdapter = RoomsAdapter()
         binding.viewModel = roomsViewModel
         binding.lifecycleOwner = this
-        binding.listRoom.adapter = adapter
+        binding.listRoom.adapter = roomsAdapter
         binding.buttonCreateRoom.setOnClickListener { deployActivityOf(CreateRoomActivity::class.java) }
         binding.buttonMypage.setOnClickListener { deployActivityOf(MyPageActivity::class.java) }
+        binding.buttonReplayVideos.setOnClickListener { deployActivityOf(ReplaysActivity::class.java) }
         binding.windowSwipeRefresh.setOnRefreshListener { roomsViewModel.loadAllRooms() }
         roomsViewModel.rooms.observe(this) {
             printLog(it)
-            adapter.submitList(it)
+            roomsAdapter.submitList(it)
             binding.windowSwipeRefresh.isRefreshing = false
         }
     }

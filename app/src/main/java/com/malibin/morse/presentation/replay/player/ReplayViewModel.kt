@@ -1,4 +1,4 @@
-package com.malibin.morse.presentation.replay
+package com.malibin.morse.presentation.replay.player
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData

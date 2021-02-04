@@ -12,6 +12,7 @@ import com.malibin.morse.data.service.params.VerifyEmailParams
 import com.malibin.morse.data.service.response.BaseResponse
 import com.malibin.morse.data.service.response.LoginResponse
 import com.malibin.morse.data.service.response.MyPageResponse
+import com.malibin.morse.data.service.response.ReplayVideoResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -82,6 +83,9 @@ interface MorseService {
 
     @POST("room/live/search-all")
     suspend fun getAllRooms(): BaseResponse<List<Room>>
+
+    @POST("room/history/search-all")
+    suspend fun getReplayVideos(): BaseResponse<List<ReplayVideoResponse>>
 
     @POST("chat/send/message")
     suspend fun sendChatMessage(

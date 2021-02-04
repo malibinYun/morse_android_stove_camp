@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 class RoomsViewModel @ViewModelInject constructor(
     private val roomsRepository: RoomsRepository,
 ) : ViewModel() {
+
     private val _rooms = MutableLiveData<List<Room>>(emptyList())
     val rooms: LiveData<List<Room>> = _rooms
 
