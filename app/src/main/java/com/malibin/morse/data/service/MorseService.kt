@@ -84,7 +84,7 @@ interface MorseService {
     @POST("room/live/search-all")
     suspend fun getAllRooms(): BaseResponse<List<Room>>
 
-    @POST("room/history/search-all")
+    @GET("room/history/search-all")
     suspend fun getReplayVideos(): BaseResponse<List<ReplayVideoResponse>>
 
     @POST("chat/send/message")

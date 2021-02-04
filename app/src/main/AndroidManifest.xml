@@ -20,7 +20,6 @@
         <activity android:name=".presentation.replay.player.ReplayActivity"></activity>
         <activity android:name=".presentation.rooms.create.CreateRoomActivity" />
         <activity android:name=".presentation.rooms.RoomsActivity" />
-        <activity android:name=".presentation.TestActivity" />
         <activity android:name=".presentation.viewer.ViewerActivity" />
         <activity
             android:name=".presentation.broadcast.BroadCastActivity"

@@ -80,7 +80,6 @@ class PeerConnectionClient(
         printLog("setRemoteDescription Called")
         val sdpDescription = preferCodec(sessionDescription.description, "VP8", false)
         //sdpDescription = setStartBitrate(sdpDescription)
-//        val temp = Temp.setStartBitrate("opus", false, sdpDescription, 32)
         val remoteDescription = SessionDescription(sessionDescription.type, sdpDescription)
         peerConnection.setRemoteDescription(sdpObserver, remoteDescription)
         printLog("Remote SDP set succesfully")
