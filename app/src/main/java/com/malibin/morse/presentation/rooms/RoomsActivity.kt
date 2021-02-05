@@ -14,6 +14,7 @@ import com.malibin.morse.databinding.ItemRoomBinding
 import com.malibin.morse.presentation.mypage.MyPageActivity
 import com.malibin.morse.presentation.replay.ReplaysActivity
 import com.malibin.morse.presentation.rooms.create.CreateRoomActivity
+import com.malibin.morse.presentation.search.SearchActivity
 import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.presentation.viewer.ViewerActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,15 +35,16 @@ class RoomsActivity : AppCompatActivity() {
 
     private fun initView(binding: ActivityRoomsBinding) {
         val roomsAdapter = RoomsAdapter()
+        roomsAdapter.onRoomClick = { deployViewerActivity(it) }
         binding.viewModel = roomsViewModel
         binding.lifecycleOwner = this
         binding.listRoom.adapter = roomsAdapter
-        binding.buttonCreateRoom.setOnClickListener { deployActivityOf(CreateRoomActivity::class.java) }
         binding.buttonMypage.setOnClickListener { deployActivityOf(MyPageActivity::class.java) }
+        binding.buttonCreateRoom.setOnClickListener { deployActivityOf(CreateRoomActivity::class.java) }
+        binding.buttonSearch.setOnClickListener { deployActivityOf(SearchActivity::class.java) }
         binding.buttonReplayVideos.setOnClickListener { deployActivityOf(ReplaysActivity::class.java) }
         binding.windowSwipeRefresh.setOnRefreshListener { roomsViewModel.loadAllRooms() }
         roomsViewModel.rooms.observe(this) {
-            printLog(it)
             roomsAdapter.submitList(it)
             binding.windowSwipeRefresh.isRefreshing = false
         }
@@ -65,36 +67,6 @@ class RoomsActivity : AppCompatActivity() {
         if (requestCode == ViewerActivity.REQUEST_CODE && resultCode == ViewerActivity.RESULT_ALREADY_CLOSED) {
             val room = data?.getSerializableExtra(ViewerActivity.KEY_ROOM) as? Room ?: return
             roomsViewModel.removeRoom(room)
-        }
-    }
-
-    private inner class RoomsAdapter : ListAdapter<Room, RoomViewHolder>(ItemDiffCallback()) {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomViewHolder {
-            return RoomViewHolder(ItemRoomBinding.inflate(layoutInflater, parent, false))
-        }
-
-        override fun onBindViewHolder(holder: RoomViewHolder, position: Int) {
-            holder.bind(getItem(position))
-        }
-    }
-
-    private class ItemDiffCallback : DiffUtil.ItemCallback<Room>() {
-        override fun areItemsTheSame(oldItem: Room, newItem: Room): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: Room, newItem: Room): Boolean {
-            return oldItem == newItem
-        }
-    }
-
-    inner class RoomViewHolder(
-        private val binding: ItemRoomBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(room: Room) {
-            binding.room = room
-            binding.root.setOnClickListener { deployViewerActivity(room) }
         }
     }
 }

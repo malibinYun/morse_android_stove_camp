@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Morse"
         android:usesCleartextTraffic="true">
+        <activity android:name=".presentation.search.SearchActivity"></activity>
         <activity
             android:name=".presentation.replay.ReplaysActivity"
             android:screenOrientation="portrait" />

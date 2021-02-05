@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.malibin.morse.presentation.search.SearchViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.search.SearchActivity">
+
+        <ImageButton
+            android:id="@+id/button_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:onClick="@{(view) -> viewModel.searchRooms()}"
+            app:layout_constraintBottom_toBottomOf="@+id/text_search_query"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_search_query"
+            app:srcCompat="@android:drawable/ic_menu_search" />
+
+        <EditText
+            android:id="@+id/text_search_query"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="@={viewModel.queryText}"
+            app:layout_constraintEnd_toStartOf="@+id/button_search"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_results_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@{@string/search_list_n(viewModel.rooms.size)}"
+            android:visibility="@{viewModel.rooms == null ? View.GONE : View.VISIBLE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_search_query"
+            tools:text="@string/search_list_n" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_search_results"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_results_number"
+            app:layout_goneMarginTop="8dp"
+            tools:itemCount="4"
+            tools:listitem="@layout/item_room" />
+
+        <include
+            android:id="@+id/window_loading"
+            layout="@layout/window_loading"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:isLoading="@{viewModel.isLoading()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
