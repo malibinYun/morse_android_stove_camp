@@ -70,8 +70,18 @@ fun bindingDate(textView: TextView, date: Date?) {
 
 @BindingAdapter("imageUrl")
 fun bindingImageUrl(imageView: ImageView, imageUrl: String?) {
+    if (imageUrl == null) return
     Glide.with(imageView)
         .load(imageUrl)
         .placeholder(R.drawable.placeholder)
+        .into(imageView)
+}
+
+@BindingAdapter("gifUrl")
+fun bindingGifUrl(imageView: ImageView, gifUrl: String?) {
+    if (gifUrl == null) return
+    Glide.with(imageView)
+        .asGif()
+        .load(gifUrl)
         .into(imageView)
 }

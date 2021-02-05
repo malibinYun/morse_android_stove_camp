@@ -10,7 +10,8 @@ import java.util.*
 data class ReplayVideo(
     val id: Int,
     val url: String,
-    val thumbnailUrl: String,
+    val imageThumbnailUrl: String,
+    val gifThumbnailUrl: String,
     val title: String,
     val nickname: String,
     val content: String,

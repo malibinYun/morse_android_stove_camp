@@ -43,7 +43,7 @@ class PeerConnectionClient(
         peerConnection.addTrack(videoTrack, mediaStreamLabels)
 
         Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO)
-        setVideoMaxBitrate(1700)
+        setVideoMaxBitrate(5000)
     }
 
     private fun setVideoMaxBitrate(maxBitrateKbps: Int?) {
