@@ -72,6 +72,6 @@ fun bindingDate(textView: TextView, date: Date?) {
 fun bindingImageUrl(imageView: ImageView, imageUrl: String?) {
     Glide.with(imageView)
         .load(imageUrl)
-        .placeholder(R.drawable.twitch)
+        .placeholder(R.drawable.placeholder)
         .into(imageView)
 }

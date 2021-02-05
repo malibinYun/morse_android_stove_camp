@@ -17,12 +17,16 @@ import kotlinx.coroutines.launch
 class ReplaysViewModel @ViewModelInject constructor(
     private val replayVideosRepository: ReplayVideosRepository,
 ) : ViewModel() {
-
     private val _replayVideos = MutableLiveData<List<ReplayVideo>>(emptyList())
     val replayVideos: LiveData<List<ReplayVideo>> = _replayVideos
 
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     fun loadAllReplayVideos() = viewModelScope.launch {
+        _isLoading.value = true
         val allReplayVideos = replayVideosRepository.getReplayVideos()
         _replayVideos.postValue(allReplayVideos)
+        _isLoading.value = false
     }
 }
