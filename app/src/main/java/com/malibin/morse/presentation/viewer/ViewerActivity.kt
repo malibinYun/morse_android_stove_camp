@@ -90,7 +90,8 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
         binding.textInput.setOnEditorActionListener(this)
         binding.buttonPivot.setOnClickListener {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        }}
+        }
+    }
 
     private fun sendChatMessage() {
         val inputView = portraitBinding?.textInput
@@ -146,8 +147,10 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
     }
 
     private fun onBroadCastClosed() {
-        showToast(R.string.broadcast_closed)
-        finish()
+        setResult(RESULT_REQUEST_REFRESH)
+        BroadCastFinishedDialog(this).apply {
+            onButtonClickListener = { finish() }
+        }.show()
     }
 
     override fun onStop() {
@@ -168,6 +171,7 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
     companion object {
         const val KEY_ROOM = "KEY_ROOM"
         const val RESULT_ALREADY_CLOSED = 100
+        const val RESULT_REQUEST_REFRESH = 101
         const val REQUEST_CODE = 1000
 
         private const val SCROLL_DOWN = 1

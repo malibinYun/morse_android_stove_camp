@@ -2,20 +2,14 @@ package com.malibin.morse.presentation.rooms
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.malibin.morse.data.entity.Room
 import com.malibin.morse.databinding.ActivityRoomsBinding
-import com.malibin.morse.databinding.ItemRoomBinding
 import com.malibin.morse.presentation.mypage.MyPageActivity
 import com.malibin.morse.presentation.replay.ReplaysActivity
 import com.malibin.morse.presentation.rooms.create.CreateRoomActivity
 import com.malibin.morse.presentation.search.SearchActivity
-import com.malibin.morse.presentation.utils.printLog
 import com.malibin.morse.presentation.viewer.ViewerActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -64,9 +58,14 @@ class RoomsActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == ViewerActivity.REQUEST_CODE && resultCode == ViewerActivity.RESULT_ALREADY_CLOSED) {
-            val room = data?.getSerializableExtra(ViewerActivity.KEY_ROOM) as? Room ?: return
-            roomsViewModel.removeRoom(room)
+        if (requestCode == ViewerActivity.REQUEST_CODE) {
+            if (resultCode == ViewerActivity.RESULT_ALREADY_CLOSED) {
+                val room = data?.getSerializableExtra(ViewerActivity.KEY_ROOM) as? Room ?: return
+                roomsViewModel.removeRoom(room)
+            }
+            if (resultCode == ViewerActivity.RESULT_REQUEST_REFRESH) {
+                roomsViewModel.loadAllRooms()
+            }
         }
     }
 }
