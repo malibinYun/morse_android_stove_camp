@@ -1,6 +1,7 @@
 package com.malibin.morse.presentation.viewer
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
@@ -69,6 +70,9 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
         binding.listChatting.itemAnimator = null
         binding.buttonSend.setOnClickListener { sendChatMessage() }
         binding.textInput.setOnEditorActionListener(this)
+        binding.buttonPivot.setOnClickListener {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
     }
 
     private fun initView(binding: ActivityViewerPortraitBinding) {
@@ -84,7 +88,9 @@ class ViewerActivity : AppCompatActivity(), TextView.OnEditorActionListener {
         binding.listChatting.itemAnimator = null
         binding.buttonSend.setOnClickListener { sendChatMessage() }
         binding.textInput.setOnEditorActionListener(this)
-    }
+        binding.buttonPivot.setOnClickListener {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }}
 
     private fun sendChatMessage() {
         val inputView = portraitBinding?.textInput

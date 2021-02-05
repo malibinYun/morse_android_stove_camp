@@ -16,25 +16,39 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Morse"
         android:usesCleartextTraffic="true">
-        <activity android:name=".presentation.replay.ReplaysActivity"></activity>
-        <activity android:name=".presentation.replay.player.ReplayActivity">
-
-        </activity>
-        <activity android:name=".presentation.rooms.create.CreateRoomActivity" />
-        <activity android:name=".presentation.rooms.RoomsActivity" />
-        <activity android:name=".presentation.viewer.ViewerActivity" />
+        <activity
+            android:name=".presentation.replay.ReplaysActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".presentation.replay.player.ReplayActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".presentation.rooms.create.CreateRoomActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".presentation.rooms.RoomsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".presentation.viewer.ViewerActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.broadcast.BroadCastActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".presentation.signup.SignUpActivity" />
-        <activity android:name=".presentation.login.LoginActivity">
+        <activity
+            android:name=".presentation.signup.SignUpActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".presentation.login.LoginActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.mypage.MyPageActivity" />
+        <activity
+            android:name=".presentation.mypage.MyPageActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
