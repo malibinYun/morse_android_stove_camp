@@ -17,7 +17,9 @@
         android:theme="@style/Theme.Morse"
         android:usesCleartextTraffic="true">
         <activity android:name=".presentation.replay.ReplaysActivity"></activity>
-        <activity android:name=".presentation.replay.player.ReplayActivity"></activity>
+        <activity android:name=".presentation.replay.player.ReplayActivity">
+
+        </activity>
         <activity android:name=".presentation.rooms.create.CreateRoomActivity" />
         <activity android:name=".presentation.rooms.RoomsActivity" />
         <activity android:name=".presentation.viewer.ViewerActivity" />

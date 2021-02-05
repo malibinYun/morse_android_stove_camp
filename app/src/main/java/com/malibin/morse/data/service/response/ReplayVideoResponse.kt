@@ -9,20 +9,22 @@ import java.util.*
  */
 
 data class ReplayVideoResponse(
-    val url: String,
-    val thumbnailUrl: String,
+    val roomIdx: Int,
+    val presenterIdx: Int,
+    val presenterNickname: String,
+    val recordLocation: String,
+    val thumbnailUrl: String?,
     val title: String,
     val contents: String,
     val createdAt: Long,
-    val id: Int,
-    val nickname: String,
+    val endStreamAt: Long,
 ) {
     fun toReplayVideo() = ReplayVideo(
-        id = id,
-        url = url,
-        thumbnailUrl = thumbnailUrl,
+        id = roomIdx,
+        url = recordLocation,
+        thumbnailUrl = thumbnailUrl ?: "아직안들어옴",
         title = title,
-        nickname = nickname,
+        nickname = presenterNickname,
         content = contents,
         broadCastDate = Date(createdAt),
     )

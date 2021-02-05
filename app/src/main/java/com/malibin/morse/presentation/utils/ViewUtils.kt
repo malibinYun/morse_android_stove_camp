@@ -5,10 +5,13 @@ import android.content.Context
 import android.content.res.Configuration
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.databinding.BindingAdapter
+import com.bumptech.glide.Glide
+import com.malibin.morse.R
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
@@ -63,4 +66,12 @@ fun bindingIsActivated(view: View, isActivated: Boolean?) {
 @BindingAdapter("date")
 fun bindingDate(textView: TextView, date: Date?) {
     textView.text = SimpleDateFormat("yyyy.MM.dd", Locale.KOREA).format(date ?: return)
+}
+
+@BindingAdapter("imageUrl")
+fun bindingImageUrl(imageView: ImageView, imageUrl: String?) {
+    Glide.with(imageView)
+        .load(imageUrl)
+        .placeholder(R.drawable.twitch)
+        .into(imageView)
 }
