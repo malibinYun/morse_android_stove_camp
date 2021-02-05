@@ -18,6 +18,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 /**
  * Created By Malibin
@@ -83,6 +84,11 @@ interface MorseService {
 
     @POST("room/live/search-all")
     suspend fun getAllRooms(): BaseResponse<List<Room>>
+
+    @GET("room/live/search")
+    suspend fun searchRooms(
+        @Query("keyword") keyword: String,
+    ): BaseResponse<List<Room>>
 
     @GET("room/history/search-all")
     suspend fun getReplayVideos(): BaseResponse<List<ReplayVideoResponse>>

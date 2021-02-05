@@ -14,11 +14,8 @@ class RoomsRepository @Inject constructor(
         return@withContext response.data
     }
 
-//    suspend fun getAllRooms(): List<Room> {
-//        return listOf(
-//            Room(0, "말리빈의 방송", "호놀룰루 유튭에이어서 이젠 스트리밍까지?", 1),
-//            Room(1, "고영희", "역시 방송은 고영희지", 100),
-//            Room(2, "고스트하스왕", "하스슷톤방송입니다", 500),
-//        )
-//    }
+    suspend fun searchRooms(keyword: String): List<Room> = withContext(Dispatchers.IO) {
+        val response = morseService.searchRooms(keyword)
+        return@withContext response.data
+    }
 }

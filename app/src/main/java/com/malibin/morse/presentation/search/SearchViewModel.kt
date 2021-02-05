@@ -18,7 +18,7 @@ class SearchViewModel @ViewModelInject constructor(
     private val roomsRepository: RoomsRepository,
 ) : ViewModel() {
 
-    val queryText = MutableLiveData("")
+    val keywordText = MutableLiveData("")
 
     private val _rooms = MutableLiveData<List<Room>>()
     val rooms: LiveData<List<Room>> = _rooms
@@ -27,9 +27,8 @@ class SearchViewModel @ViewModelInject constructor(
     val isLoading: LiveData<Boolean> = _isLoading
 
     fun searchRooms() = viewModelScope.launch {
-        val query = queryText.value.orEmpty()
-
-        val allRooms = roomsRepository.getAllRooms()
-        _rooms.postValue(allRooms)
+        val keyword = keywordText.value.orEmpty()
+        val searchedRooms = roomsRepository.searchRooms(keyword)
+        _rooms.postValue(searchedRooms)
     }
 }
