@@ -103,7 +103,7 @@ sonarqube {
     properties {
         property "sonar.host.url", "http://localhost:9000/"
         property "sonar.login", "admin"
-        property "sonar.password", "admin"
+        property "sonar.password", "1234"
         property "sonar.projectKey", "MorseAndroid"
         property "sonar.projectName", "MorseAndroid"
         property "sonar.projectVersion", "1.0"

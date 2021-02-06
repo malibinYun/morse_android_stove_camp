@@ -119,6 +119,7 @@ class BroadCastViewModel @ViewModelInject constructor(
         }
 
         override fun onChatReceived(chatMessage: ChatMessage) {
+            // do nothing
         }
 
         override fun onCreateRoomId(roomId: Int) {

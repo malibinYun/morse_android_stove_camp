@@ -9,8 +9,10 @@ import org.webrtc.DataChannel
 
 abstract class DataChannelObserver : DataChannel.Observer {
     override fun onBufferedAmountChange(p0: Long) {
+        // do nothing
     }
 
     override fun onStateChange() {
+        // do nothing
     }
 }

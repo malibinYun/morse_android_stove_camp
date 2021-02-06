@@ -71,27 +71,16 @@ class PeerConnectionClient(
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
             optional.add(MediaConstraints.KeyValuePair("internalSctpDataChannels", "true"))
-//            mandatory.add(MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"))
-//            optional.add(MediaConstraints.KeyValuePair("RtpDataChannels", "true"))
         }
     }
 
     fun setRemoteDescription(sessionDescription: SessionDescription) {
         printLog("setRemoteDescription Called")
         val sdpDescription = preferCodec(sessionDescription.description, "VP8", false)
-        //sdpDescription = setStartBitrate(sdpDescription)
         val remoteDescription = SessionDescription(sessionDescription.type, sdpDescription)
         peerConnection.setRemoteDescription(sdpObserver, remoteDescription)
         printLog("Remote SDP set succesfully")
-        // drain 하는거 말고 하는게 없음.
     }
-//
-//    private fun setLocalDescription(sessionDescription: SessionDescription) {
-//        val description = preferCodec(sessionDescription.description, "VP8", false)
-//        val localDescription = SessionDescription(sessionDescription.type, description)
-//        printLog("onCreateSuccess // set local description")
-//        peerConnection.setLocalDescription(this, localDescription)
-//    }
 
     fun addRemoteIceCandidate(iceCandidate: IceCandidate) {
         printLog("addRemoteIceCandidate called")
@@ -100,7 +89,6 @@ class PeerConnectionClient(
 
     fun attachRenderer(streamingMode: StreamingMode, renderer: VideoSink) = when (streamingMode) {
         StreamingMode.BROADCAST -> {
-            // media track manager 를 이 클래스에 집어넣는다면 이렇게 처리
         }
         StreamingMode.VIEWER -> {
             val receiveVideoTrack = findReceiveVideoTrack()
@@ -110,7 +98,6 @@ class PeerConnectionClient(
 
     fun detachRenderer(streamingMode: StreamingMode, renderer: VideoSink) = when (streamingMode) {
         StreamingMode.BROADCAST -> {
-
         }
         StreamingMode.VIEWER -> {
             val receiveVideoTrack = findReceiveVideoTrack()
@@ -135,6 +122,7 @@ class PeerConnectionClient(
         try {
             dataChannel.dispose()
         } catch (e: Exception) {
+            // do nothing
         }
         peerConnection.dispose()
         println("peerConnection closed")
@@ -198,7 +186,6 @@ class PeerConnectionClient(
             this.localDescription = localDescription
             printLog("onCreateSuccess // set local description")
             peerConnection.setLocalDescription(this, localDescription)
-//            setLocalDescription(sessionDescription)
         }
 
         override fun onSetSuccess() {
@@ -209,7 +196,6 @@ class PeerConnectionClient(
                 createOfferCallback?.onOfferSetSuccess(localDescription)
                 return
             }
-            //drainCandidates()
         }
 
         override fun onCreateFailure(message: String?) {
