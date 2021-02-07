@@ -11,8 +11,6 @@ y
 Iapp/src/main/java/com/malibin/morse/presentation/signup/SignUpActivity.kt,2\b\2b3ba869e022a296cf22153d1a667e5c7c2b393c
 y
 Iapp/src/main/java/com/malibin/morse/presentation/signup/SignUpFragment.kt,5\1\5149c8fa8e49f6d331cb2fbcedc70005aed6f75d
-q
-Aapp/src/main/java/com/malibin/morse/presentation/LoginActivity.kt,6\b\6b5ce28f949f0c7acc5de598ccbf3266e544491e
 y
 Iapp/src/main/java/com/malibin/morse/presentation/utils/SingleLiveEvent.kt,9\a\9a1a4a0cec914eb1795c62443fddcbc08714b128
 s
