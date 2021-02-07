@@ -1,6 +1,6 @@
 # Morse 모두의 스트리밍
 
-<img src="image\logo.png" width="100" align="left"/>
+<img src="image\logo.png" width="100"/>
 
 스마일게이트 스토브 개발 캠프에서 2달 간 진행한 팀 프로젝트입니다.
 
