@@ -1,6 +1,8 @@
 # Morse 모두의 스트리밍
 
-<img src="image\logo.png" width="100"/>
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fnightmare73%2Fmorse_android_stove_camp&count_bg=%23FF9350&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Visitors+Hi&edge_flat=false)](https://hits.seeyoufarm.com)
+
+<img src="./image/logo.png" width="100"/>
 
 스마일게이트 스토브 개발 캠프에서 2달 간 진행한 팀 프로젝트입니다.
 
